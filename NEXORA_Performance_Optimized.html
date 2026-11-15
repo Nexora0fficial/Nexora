@@ -1,0 +1,1623 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080b14">
+<title>NEXORA 2.0 — World Information Network</title>
+<style>
+:root{--bg:#080b14;--panel:#111a2a;--panel2:#17243a;--line:#ffffff18;--txt:#f3f7ff;--muted:#a4b1c5;--blue:#91baff;--cyan:#6fe3d7;--violet:#bba5ff;--green:#8ce0b5;--amber:#ffcf70;--red:#ff8b8b;scroll-padding-top:82px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 78% -12%,#20365a 0,transparent 42%),radial-gradient(ellipse at 12% 30%,#1b2048 0,transparent 35%),var(--bg);color:var(--txt);font:15px/1.58 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+a{color:var(--blue)}button,input,select{font:inherit}.wrap{width:min(1160px,calc(100% - 36px));margin:auto;position:relative;z-index:2}
+
+/* Ambient starfield & top scroll progress */
+#starfield{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.65}
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0%;z-index:60;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));box-shadow:0 0 12px var(--cyan);transition:width .08s linear}
+.aurora{position:fixed;inset:-20% -10% auto;height:420px;z-index:0;pointer-events:none;background:radial-gradient(circle at 25% 40%,#6fe3d718,transparent 48%),radial-gradient(circle at 75% 30%,#91baff1e,transparent 50%);filter:blur(48px);animation:auroraDrift 16s ease-in-out infinite alternate}
+@keyframes auroraDrift{0%{transform:translate3d(-2%,0,0) scale(1)}100%{transform:translate3d(3%,4%,0) scale(1.06)}}
+
+/* Header */
+header{position:sticky;top:0;z-index:20;background:#080b14e0;backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.nav{height:70px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:.18em}
+.logo{height:35px;width:35px;border-radius:11px;background:linear-gradient(135deg,#a9ceff,#a18dff,#6ce3d6);display:grid;place-items:center;color:#08101b;box-shadow:0 0 20px #91baff44;animation:logoGlow 4s ease-in-out infinite}
+@keyframes logoGlow{50%{box-shadow:0 0 28px #6fe3d766;transform:scale(1.04)}}
+.navlinks{display:flex;gap:18px;align-items:center}.navlinks a,.navlinks button.navbtn{font-size:12px;color:var(--muted);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;position:relative;transition:color .2s}
+.navlinks a:hover,.navlinks button.navbtn:hover{color:#fff}
+.navlinks a:after,.navlinks button.navbtn:after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:1.5px;background:linear-gradient(90deg,var(--cyan),var(--blue));transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+.navlinks a:hover:after,.navlinks button.navbtn:hover:after{transform:scaleX(1)}
+.school{font-size:9px;text-align:center;line-height:1.4;color:#d0e0ff;border:1px solid #91baff44;padding:7px 10px;border-radius:10px;background:#ffffff05}
+
+/* Hero & Enhanced Globe */
+.hero{padding:60px 0 28px;display:grid;grid-template-columns:1.05fr .95fr;gap:25px;align-items:center}
+.hero-copy>*{opacity:0;transform:translateY(18px);animation:heroIn .7s cubic-bezier(.22,1,.36,1) forwards}
+.hero-copy>*:nth-child(1){animation-delay:.05s}.hero-copy>*:nth-child(2){animation-delay:.14s}.hero-copy>*:nth-child(3){animation-delay:.22s}.hero-copy>*:nth-child(4){animation-delay:.3s}
+@keyframes heroIn{to{opacity:1;transform:none}}
+.eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:800;color:var(--cyan)}
+h1{font-size:clamp(46px,7vw,78px);line-height:.98;letter-spacing:-.065em;margin:14px 0}
+h1 span{background:linear-gradient(100deg,#fff,#9bbdff,#86e9dc,#bba5ff);background-size:200% auto;background-clip:text;-webkit-background-clip:text;color:transparent;animation:textShimmer 8s linear infinite}
+@keyframes textShimmer{to{background-position:200% center}}
+.hero p{color:var(--muted);max-width:570px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 15px;border-radius:11px;border:1px solid var(--line);background:#ffffff0a;color:var(--txt);text-decoration:none;font-size:12px;font-weight:750;cursor:pointer;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);border-color:#91baff77;background:#ffffff14;box-shadow:0 8px 24px #04081280}
+.btn.primary{background:linear-gradient(110deg,#a9caff,#b6a8ff);color:#09111d;border:0;box-shadow:0 8px 28px #91baff33}
+.btn.primary:hover{box-shadow:0 12px 32px #91baff55}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+
+.globearea{height:285px;display:grid;place-items:center;position:relative}
+.globe-aura{position:absolute;width:240px;height:240px;border-radius:50%;border:1px dashed #6fe3d744;animation:spin 24s linear infinite}
+.globe-aura:after{content:"";position:absolute;top:-5px;left:50%;width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
+.globe{width:205px;height:205px;border-radius:50%;display:grid;place-items:center;font-size:70px;background:radial-gradient(circle at 32% 27%,#3a6192,#142744 55%,#070d18 80%);border:1px solid #9bc7ff77;box-shadow:inset -20px -18px 45px #02050b,0 0 70px #609dff40;position:relative;animation:float 5s ease-in-out infinite}
+.globe:before,.globe:after{content:"";position:absolute;inset:10% -10%;border:1px solid #8dbbff66;border-radius:50%;transform:rotate(-28deg);animation:ringTilt 9s ease-in-out infinite alternate}
+.globe:after{inset:-9% 24%;transform:rotate(34deg);animation-delay:-4s}
+@keyframes ringTilt{to{transform:rotate(-18deg) scale(1.03)}}
+@keyframes float{50%{transform:translateY(-9px)}}
+.float{position:absolute;background:#111c30e6;backdrop-filter:blur(10px);border:1px solid #91baff44;border-radius:10px;padding:7px 11px;font-size:10px;color:#dce8ff;box-shadow:0 10px 25px #02050b88;animation:floatBadge 4.5s ease-in-out infinite}
+.f1{top:10%;left:2%}.f2{right:0;top:30%;animation-delay:-1.5s}.f3{bottom:8%;left:8%;animation-delay:-3s}
+@keyframes floatBadge{50%{transform:translateY(-6px)}}
+
+/* Cards, Stats & Scroll Reveal */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 28px}
+.stat,.panel,.tile,.livecard{border:1px solid var(--line);background:linear-gradient(145deg,#ffffff0d,#ffffff03);border-radius:15px;padding:16px;position:relative;overflow:hidden}
+.stat b{display:block;font-size:24px}.stat span{font-size:10px;color:var(--muted)}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.reveal.in{opacity:1;transform:none}
+
+.section{padding:25px 0 40px;scroll-margin-top:78px}.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:16px;flex-wrap:wrap}.sectionhead h2{font-size:27px;letter-spacing:-.04em;margin:5px 0}.sectionhead p{font-size:12px;color:var(--muted);margin:0}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 13px}.tab{white-space:nowrap;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);padding:9px 12px;font-size:11px;cursor:pointer;transition:all .2s}
+.tab:hover{color:#fff;border-color:#91baff55}.tab.active{background:#91baff20;color:#e0ebff;border-color:#91baff77;box-shadow:0 0 18px #91baff22}
+.tabpanel{animation:tabIn .35s cubic-bezier(.22,1,.36,1)}
+@keyframes tabIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}.search{flex:1;min-width:190px;padding:11px 13px;background:#111a2a;color:white;border:1px solid var(--line);border-radius:10px;outline:none;transition:border-color .2s,box-shadow .2s}.search:focus{border-color:#91baff;box-shadow:0 0 0 3px #91baff22}.select{appearance:none;-webkit-appearance:none;min-height:42px;padding:10px 38px 10px 12px;color:var(--txt);font-weight:650;font-size:12px;letter-spacing:.01em;background:linear-gradient(145deg,#182943 0%,#0d1728 100%);border:1px solid #91baff44;border-radius:11px;box-shadow:inset 0 1px 0 #ffffff0b,0 5px 16px #02071155;outline:none;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;background-image:linear-gradient(45deg,transparent 50%,#9bc7ff 50%),linear-gradient(135deg,#9bc7ff 50%,transparent 50%),linear-gradient(145deg,#182943 0%,#0d1728 100%);background-position:calc(100% - 17px) 18px,calc(100% - 12px) 18px,0 0;background-size:5px 5px,5px 5px,100% 100%;background-repeat:no-repeat}.select:hover{border-color:#6fe3d788;box-shadow:0 0 0 2px #6fe3d711,0 7px 18px #02071166}.select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #6fe3d722,0 0 20px #6fe3d71c}.select option{background:#101b2d;color:#f3f7ff;font-weight:600}#fxBase,#fxTarget,#clockZoneSelect{min-width:0}#fxConvertBtn{border-color:#91baff55;background:linear-gradient(110deg,#1b3453,#17243b);color:#dceaff}#fxAmount{background:linear-gradient(145deg,#182943,#0d1728);border-color:#91baff44}#fxAmount:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #6fe3d722}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.tile{display:flex;flex-direction:column;min-height:190px;transition:transform .25s,border-color .25s,box-shadow .25s}.tile:hover{transform:translateY(-4px);border-color:#91baff66;box-shadow:0 14px 32px #03071288}.tiletop{display:flex;justify-content:space-between;align-items:center}.emoji{height:38px;width:38px;border-radius:11px;background:#ffffff0d;display:grid;place-items:center;font-size:20px;flex-shrink:0}.pill{font-size:9px;padding:4px 7px;border-radius:99px;background:#91baff1b;color:#bfd6ff}.tile h3{font-size:15px;margin:12px 0 5px}.tile p{font-size:11px;color:var(--muted);margin:0 0 12px}.tile button{margin-top:auto;text-align:left;background:none;border:0;color:var(--blue);padding:0;font-size:11px;font-weight:750;cursor:pointer}
+
+/* Live Information Centre */
+.livecontrols{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.loc-trigger{display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;border:1px solid #6fe3d755;background:linear-gradient(135deg,#132238,#0d1728);color:#eef5ff;cursor:pointer;font-size:12px;font-weight:700;transition:all .25s;box-shadow:0 0 22px #6fe3d718}
+.loc-trigger:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 8px 26px #6fe3d72c}
+.loc-pin{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 0 #6fe3d799;animation:locPing 2.2s infinite}
+@keyframes locPing{70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.loc-badge-sub{font-size:10px;color:var(--cyan);font-weight:600;padding:2px 7px;border-radius:99px;background:#6fe3d716;border:1px solid #6fe3d733}
+
+.livebar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#ffffff06;margin-bottom:12px;font-size:11px;color:var(--muted)}
+.pulse-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);margin-right:7px;animation:blink 2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.35}}
+.livegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+/* Desktop masonry layout: cards flow vertically in balanced columns, preventing short cards from leaving large blank grid-row gaps beside the taller exchange-rate card. Mobile keeps the original grid rules below. */
+@media(min-width:761px){.global-live-grid{display:block;columns:3;column-gap:11px;column-fill:balance}.global-live-grid>.livecard{display:inline-flex;width:100%;break-inside:avoid;margin:0 0 11px;vertical-align:top}}
+.livecard{background:linear-gradient(145deg,#17243a,#101625);min-height:152px;display:flex;flex-direction:column;transition:transform .25s,border-color .25s,box-shadow .25s}
+.livecard:hover{transform:translateY(-4px);border-color:#91baff66;box-shadow:0 14px 32px #02050c99}
+.livecard::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,#ffffff0d 50%,transparent 70%);transform:translateX(-120%);transition:transform .7s ease;pointer-events:none}
+.livecard:hover::after{transform:translateX(120%)}
+.livecard.flash{animation:dataFlash .85s ease}
+@keyframes dataFlash{0%{border-color:var(--cyan);box-shadow:0 0 24px #6fe3d744}100%{border-color:var(--line);box-shadow:none}}
+.livehead{font-size:12px;font-weight:750;display:flex;justify-content:space-between;align-items:center;gap:7px}.livebadge{font-size:9px;color:var(--green);border:1px solid #8ce0b544;border-radius:99px;padding:2px 7px;white-space:nowrap}.livebadge.model{color:var(--violet);border-color:#bba5ff55}.livebadge.noaa{color:var(--cyan);border-color:#6fe3d755}
+.livevalue-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px}
+.livevalue{font-size:24px;font-weight:850;letter-spacing:-.04em;line-height:1.15}
+.livesub,.status,.source{font-size:10px;color:var(--muted)}.livesub{margin-top:5px}.status{margin-top:auto;padding-top:8px}.source{margin-top:12px}
+
+
+/* Compact interactive Earth hologram beside worldwide event feeds */
+.event-holo{display:grid;grid-template-columns:minmax(210px,280px) minmax(0,1fr);gap:18px;align-items:center;margin:12px 0 14px;padding:14px 17px;background:radial-gradient(ellipse at 18% 45%,#17395b88,transparent 58%),linear-gradient(120deg,#101d31ee,#0b1322ee);border:1px solid #6fe3d744;box-shadow:inset 0 1px 0 #ffffff0a,0 12px 34px #02071155;overflow:hidden;position:relative}
+.event-holo:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent,#6fe3d708,transparent)}
+.holo-visual{display:grid;place-items:center;min-width:0;position:relative}
+#eventEarthCanvas{width:min(100%,260px);height:auto;aspect-ratio:1;display:block;touch-action:manipulation;cursor:crosshair;filter:drop-shadow(0 0 18px #54d9e855);outline:none}
+#eventEarthCanvas:focus-visible{outline:2px solid var(--cyan);outline-offset:5px;border-radius:50%}
+.holo-tag{position:absolute;top:4px;left:4px;font-size:9px;letter-spacing:.16em;color:#a9fff2;text-transform:uppercase;font-weight:800;text-shadow:0 0 10px #6fe3d7}
+.holo-copy{min-width:0;position:relative;z-index:1}.holo-copy h3{margin:3px 0 5px;font-size:17px}.holo-copy>p{margin:0;color:var(--muted);font-size:11px;max-width:700px}
+.holo-meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}.holo-count{font-size:11px;color:#e7f2ff;border:1px solid #91baff44;background:#91baff12;border-radius:99px;padding:5px 9px}.holo-updated{font-size:9px;color:var(--muted)}
+.holo-legend{display:flex;gap:11px;flex-wrap:wrap;margin:8px 0 12px}.holo-legend span{font-size:9px;color:#c4d1e6;display:inline-flex;align-items:center;gap:5px}.holo-dot{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor}.holo-dot.quake{background:#ff777f;color:#ff777f}.holo-dot.natural{background:#ffc16d;color:#ffc16d}.holo-dot.human{background:#bba5ff;color:#bba5ff}
+ .holo-visual{overflow:visible}
+.holo-detail{position:absolute;z-index:8;width:220px;max-width:min(220px,calc(100vw - 56px));border:1px solid #6fe3d788;border-radius:13px;background:linear-gradient(145deg,#142b45f5,#091525f7);box-shadow:0 12px 34px #020711bb,0 0 22px #6fe3d722;backdrop-filter:blur(14px);padding:11px 12px;display:none;pointer-events:auto}
+.holo-detail.open{display:block;animation:holoPop .18s ease-out}
+@keyframes holoPop{from{opacity:0;transform:translateY(5px) scale(.97)}to{opacity:1;transform:none}}
+.holo-detail:before{content:"";position:absolute;left:-6px;top:22px;width:10px;height:10px;background:#142b45;border-left:1px solid #6fe3d788;border-bottom:1px solid #6fe3d788;transform:rotate(45deg)}
+.holo-detail-head{display:flex;align-items:flex-start;gap:8px;justify-content:space-between}.holo-detail b{display:block;font-size:11px;line-height:1.35;color:#eef6ff}.holo-close{flex:0 0 23px;width:23px;height:23px;border-radius:7px;border:1px solid #91baff55;background:#ffffff0b;color:#eaf4ff;cursor:pointer;line-height:1;font-size:15px;padding:0}.holo-detail p{font-size:9px;line-height:1.45;color:#b6c5d9;margin:6px 0 8px}.holo-detail a{font-size:10px;font-weight:800;text-decoration:none;color:var(--cyan)}.holo-detail a:hover{text-decoration:underline}.holo-note{font-size:9px;color:#8fa2bc;margin-top:8px}
+@media(max-width:620px){.event-holo{grid-template-columns:1fr;gap:6px;padding:13px;overflow:visible}.holo-visual{min-height:230px}.holo-tag{left:8px;top:0}#eventEarthCanvas{width:220px}.holo-copy h3{font-size:16px}.holo-detail{width:205px;max-width:calc(100vw - 42px)}}
+
+.live-subhead{margin:16px 0 8px;padding:12px 14px;border:1px solid #6fe3d733;border-radius:12px;background:linear-gradient(100deg,#6fe3d70b,#91baff08)}.live-subhead h3{margin:3px 0 4px;font-size:16px}.live-subhead p{margin:0;max-width:850px}.weather-grid,.global-live-grid{margin-bottom:12px}.weather-grid{border-bottom:1px solid var(--line);padding-bottom:14px}
+/* Card Micro-Meters & Animated Icons */
+.wx-anim{font-size:24px;animation:wxBob 3s ease-in-out infinite}
+@keyframes wxBob{50%{transform:translateY(-4px) scale(1.06)}}
+.meter-track{position:relative;height:6px;border-radius:99px;margin-top:9px;background:linear-gradient(90deg,#8ce0b5,#ffcf70 45%,#ff986b 72%,#ff6b8b);overflow:visible}
+.meter-dot{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;background:#fff;border:2px solid #080b14;box-shadow:0 0 10px #fff;transform:translate(-50%,-50%);transition:left .7s cubic-bezier(.22,1,.36,1);left:10%}
+.kp-bars{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;margin-top:9px;height:7px}
+.kp-bars span{border-radius:3px;background:#ffffff14;transition:background .4s,box-shadow .4s}
+.compass-badge{width:28px;height:28px;border-radius:50%;border:1px solid #91baff55;display:grid;place-items:center;font-size:13px;color:var(--cyan);background:#ffffff08;transition:transform .8s cubic-bezier(.22,1,.36,1)}
+.fxlist{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px;font-size:11px;color:#dbe7ff}.fxlist div{background:#ffffff07;border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+
+/* Tables & Pager */
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.dataTable{width:100%;border-collapse:collapse;min-width:650px;font-size:11px}.dataTable th,.dataTable td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}.dataTable th{color:#bad3ff;background:#ffffff08}.dataTable tr:hover td{background:#ffffff08}.country{border:0;background:none;color:#e9f1ff;text-align:left;cursor:pointer;padding:0;font-weight:700}.flag{font-size:18px;margin-right:6px}.pager{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;color:var(--muted);font-size:11px}.pager button{background:#ffffff0a;border:1px solid var(--line);color:white;border-radius:8px;padding:7px 11px;cursor:pointer}.pager button:disabled{opacity:.4;cursor:not-allowed}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail{font-size:12px;color:var(--muted)}.detail strong{color:var(--txt)}.empty{grid-column:1/-1;padding:22px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+
+/* Science Animations & Lab */
+.animgrid,.labgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.anim,.labcard{border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#17243a,#101625);padding:15px;min-height:210px;overflow:hidden;transition:transform .25s,border-color .25s}.anim:hover,.labcard:hover{transform:translateY(-3px);border-color:#91baff66}.anim h3,.labcard h3{font-size:14px;margin:4px 0}.anim p,.labcard p{font-size:10px;color:var(--muted);margin:10px 0 0}
+.orbitdemo{height:100px;display:grid;place-items:center;position:relative}.sun{height:32px;width:32px;border-radius:50%;background:#ffcf70;box-shadow:0 0 22px #ffba48}.planetorbit{position:absolute;width:94px;height:70px;border:1px solid #8db8ff66;border-radius:50%;animation:spin 7s linear infinite}.planet{position:absolute;top:8px;left:9px;width:10px;height:10px;border-radius:50%;background:#79baff;box-shadow:0 0 10px #79baff}@keyframes spin{to{transform:rotate(360deg)}}.waterdemo{height:100px;position:relative;overflow:hidden;background:linear-gradient(#162a47 0 65%,#1b6680 65%);border-radius:9px;margin-top:9px}.cloud{position:absolute;top:17px;left:16%;font-size:26px;animation:cloud 5s ease-in-out infinite alternate}@keyframes cloud{to{transform:translateX(85px)}}.rain{position:absolute;top:48px;left:57%;font-size:18px;animation:rain 1.4s linear infinite}@keyframes rain{0%{transform:translateY(-7px);opacity:0}40%{opacity:1}100%{transform:translateY(35px);opacity:0}}.quakeDemo{height:100px;display:grid;place-items:center;position:relative}.quakeLine{width:90%;height:2px;background:#6be1d7;position:relative}.quakeLine:before{content:"";position:absolute;left:48%;top:-22px;width:2px;height:46px;background:#ffbe73;transform:rotate(24deg)}.pulse{position:absolute;width:25px;height:25px;border:1px solid #ffbe73;border-radius:50%;animation:pulse 1.8s infinite}@keyframes pulse{to{transform:scale(3);opacity:0}}
+.dna-stage{height:120px;display:flex;align-items:center;justify-content:center;gap:7px;perspective:400px;overflow:hidden}.dna-pair{height:92px;width:13px;position:relative;animation:dnaWave 2.2s ease-in-out infinite;animation-delay:calc(var(--i)*-.12s)}.dna-pair:before,.dna-pair:after{content:"";position:absolute;left:0;width:13px;height:13px;border-radius:50%;background:#8bbcff;box-shadow:0 0 12px #8bbcff88}.dna-pair:after{bottom:0;background:#bba5ff;box-shadow:0 0 12px #bba5ff88}.dna-pair i{position:absolute;left:5px;top:7px;height:78px;width:3px;border-radius:4px;background:linear-gradient(#8bbcff,#bba5ff)}@keyframes dnaWave{0%,100%{transform:rotateY(0deg) scaleY(.7)}50%{transform:rotateY(65deg) scaleY(1)}}
+.satellite-stage{height:120px;display:grid;place-items:center;position:relative}.earth{width:65px;height:65px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#80d8ed,#2765a4 60%,#10294b);box-shadow:0 0 25px #5caaff55;display:grid;place-items:center;font-size:30px}.sat-orbit{position:absolute;width:150px;height:76px;border:1px solid #91baff88;border-radius:50%;transform:rotate(-25deg);animation:satSpin 5s linear infinite}.sat-orbit:after{content:"🛰️";position:absolute;right:9px;top:0;font-size:20px;filter:drop-shadow(0 0 7px #91baff)}@keyframes satSpin{to{transform:rotate(335deg)}}
+.network-stage{height:120px;position:relative;display:grid;place-items:center}.net-core{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#91baff,#bba5ff);color:#08101b;font-size:18px;z-index:2;box-shadow:0 0 24px #91baff66}.net-node{position:absolute;width:13px;height:13px;border-radius:50%;background:#6fe3d7;box-shadow:0 0 12px #6fe3d7;animation:nodePulse 2s ease-in-out infinite}.net-node:nth-child(2){top:12px;left:24%}.net-node:nth-child(3){top:22px;right:20%;animation-delay:.4s}.net-node:nth-child(4){bottom:12px;left:30%;animation-delay:.8s}.net-node:nth-child(5){bottom:17px;right:27%;animation-delay:1.2s}.net-line{position:absolute;height:1px;width:40%;background:linear-gradient(90deg,transparent,#6fe3d7aa,transparent);transform-origin:center;animation:lineGlow 2s ease-in-out infinite}.net-line.l1{transform:rotate(-25deg)}.net-line.l2{transform:rotate(25deg);animation-delay:1s}@keyframes nodePulse{50%{transform:scale(1.6);opacity:.55}}@keyframes lineGlow{50%{opacity:.25}}
+.plate-stage{height:112px;position:relative;overflow:hidden;border-radius:10px;background:linear-gradient(#13243d,#0b1728)}.plate{position:absolute;bottom:12px;height:48px;width:58%;background:linear-gradient(145deg,#597c91,#263d5a);border-top:3px solid #91baff}.plate.left{left:-4%;transform:skewY(-9deg);animation:plateLeft 4s ease-in-out infinite alternate}.plate.right{right:-4%;transform:skewY(9deg);animation:plateRight 4s ease-in-out infinite alternate}@keyframes plateLeft{to{transform:translateX(-8px) skewY(-9deg)}}@keyframes plateRight{to{transform:translateX(8px) skewY(9deg)}}.magma{position:absolute;bottom:0;left:46%;width:8%;height:24px;background:linear-gradient(#ffb66b,#e35b55);filter:blur(5px);animation:magma 2s ease-in-out infinite alternate}@keyframes magma{to{height:42px;opacity:.65}}
+.wind-stage{height:112px;display:grid;place-items:center;position:relative}.tower{position:absolute;top:40px;width:4px;height:66px;background:#b6c8e1;transform-origin:top}.blades{position:absolute;top:22px;width:62px;height:62px;animation:spin 3s linear infinite}.blades:before,.blades:after{content:"";position:absolute;left:29px;top:0;width:5px;height:62px;border-radius:5px;background:#91baff}.blades:after{transform:rotate(120deg)}.windhub{position:absolute;top:27px;width:13px;height:13px;border-radius:50%;background:#dceaff;z-index:1}
+.co2-stage{height:112px;display:flex;align-items:center;justify-content:space-evenly}.co2bubble{border:1px solid #6fe3d788;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;color:#a6fff0;font-size:10px;animation:bob 2s ease-in-out infinite}.co2bubble:nth-child(2){animation-delay:.4s}.co2bubble:nth-child(3){animation-delay:.8s}.co2arrow{color:#91baff;font-size:20px;animation:arrowPulse 1.5s infinite}@keyframes bob{50%{transform:translateY(-8px)}}@keyframes arrowPulse{50%{opacity:.35;transform:translateX(3px)}}
+
+.subnav{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.subnav a{font-size:10px;text-decoration:none;color:#c6d8f5;border:1px solid var(--line);padding:7px 10px;border-radius:99px;background:#ffffff06}.subnav a:hover{background:#91baff20}.section-intro{max-width:760px;color:var(--muted);font-size:12px;margin:-5px 0 15px}.event-list{display:grid;gap:8px;margin-top:12px}.event-item{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:10px;background:#ffffff05;transition:border-color .2s,background .2s}.event-item:hover{border-color:#91baff55;background:#ffffff0a}.event-item b{font-size:11px}.event-item p{margin:3px 0 0;font-size:10px;color:var(--muted)}.chart-bars{height:68px;display:flex;align-items:end;gap:5px;padding:8px 2px 0;border-bottom:1px solid var(--line)}.chart-bars i{display:block;flex:1;min-width:5px;border-radius:5px 5px 0 0;background:linear-gradient(#6fe3d7,#6b91dc);animation:barRise .8s ease both;transform-origin:bottom}@keyframes barRise{from{transform:scaleY(.05);opacity:.3}to{transform:scaleY(1);opacity:1}}.chart-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin-top:5px}
+
+/* Standard Modal */
+.modal{position:fixed;inset:0;background:#02050be8;backdrop-filter:blur(10px);z-index:40;display:none;place-items:center;padding:15px}
+.modal.show{display:grid;animation:fadeIn .25s ease}
+.modalbox{width:min(650px,100%);max-height:88vh;overflow:auto;background:linear-gradient(155deg,#131e32,#0c1322);border:1px solid #91baff44;border-radius:18px;padding:22px;box-shadow:0 24px 60px #000000aa;animation:popIn .32s cubic-bezier(.22,1,.36,1)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{opacity:0;transform:scale(.95) translateY(14px)}to{opacity:1;transform:none}}
+.close{float:right;background:#ffffff12;border:1px solid var(--line);color:white;border-radius:8px;padding:6px 11px;cursor:pointer;font-size:11px}.close:hover{background:#ffffff22}
+
+/* DEDICATED THEMED LOCATION CHANGING PAGE */
+.loc-page{position:fixed;inset:0;z-index:50;display:none;overflow-y:auto;background:radial-gradient(ellipse at 82% 8%,#23406f66 0,transparent 48%),radial-gradient(ellipse at 14% 85%,#1e3a5f55 0,transparent 45%),#060912f5;backdrop-filter:blur(22px)}
+.loc-page.show{display:block;animation:locPageIn .38s cubic-bezier(.22,1,.36,1)}
+@keyframes locPageIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.loc-shell{width:min(1040px,calc(100% - 32px));margin:26px auto 48px}
+.loc-topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.loc-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin:20px 0;align-items:stretch}
+.loc-active-hud{border:1px solid #6fe3d744;background:linear-gradient(145deg,#16253e,#0d1525);border-radius:18px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:18px;position:relative;overflow:hidden}
+.radar{width:84px;height:84px;border-radius:50%;border:1px solid #6fe3d755;position:relative;display:grid;place-items:center;flex-shrink:0;background:radial-gradient(circle,#6fe3d718,transparent 70%)}
+.radar:before{content:"";position:absolute;inset:18%;border-radius:50%;border:1px dashed #91baff44}
+.radar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,#6fe3d755 0deg,transparent 75deg);animation:spin 3.2s linear infinite}
+.radar-center{position:relative;z-index:2;font-size:24px}
+.loc-gps-box{border:1px solid var(--line);background:linear-gradient(145deg,#ffffff0a,#ffffff03);border-radius:18px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+.loc-search-wrap{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.loc-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:#ffffff07;color:var(--muted);padding:7px 13px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+.chip:hover{color:#fff;border-color:#91baff66}
+.chip.active{background:#6fe3d720;color:var(--cyan);border-color:#6fe3d777;box-shadow:0 0 18px #6fe3d722}
+.loc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.loc-card{text-align:left;width:100%;border:1px solid var(--line);background:linear-gradient(145deg,#131e33,#0c1322);border-radius:15px;padding:15px;color:var(--txt);cursor:pointer;transition:transform .22s,border-color .22s,box-shadow .22s;position:relative;overflow:hidden}
+.loc-card:hover{transform:translateY(-3px);border-color:#91baff77;box-shadow:0 12px 28px #02050c99}
+.loc-card.current{border-color:var(--cyan);background:linear-gradient(145deg,#162a42,#0f1c30);box-shadow:0 0 24px #6fe3d728}
+.loc-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.loc-card h4{margin:8px 0 3px;font-size:15px;letter-spacing:-.02em}
+.loc-card p{margin:0;font-size:11px;color:var(--muted)}
+.loc-coords{margin-top:10px;display:inline-block;font-size:10px;color:#bfd6ff;background:#91baff16;border:1px solid #91baff33;padding:3px 8px;border-radius:99px}
+
+
+.chooser-native{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important}.chooser-trigger{min-width:120px;justify-content:space-between;gap:8px;padding:8px 10px}.chooser-trigger .loc-badge-sub{white-space:nowrap}.choice-card{min-height:82px}.choice-card h4{font-size:14px}.choice-card p{margin-top:4px}
+.archive-picker{position:relative;display:inline-block;max-width:100%;z-index:8}.archive-picker-trigger{min-width:min(290px,calc(100vw - 64px));justify-content:space-between;padding:10px 13px}.archive-picker-menu{position:absolute;left:0;top:calc(100% + 9px);width:min(340px,calc(100vw - 48px));padding:8px;border:1px solid #6fe3d766;border-radius:15px;background:linear-gradient(145deg,#172943f5,#0b1424f7);box-shadow:0 18px 45px #020711bb,0 0 24px #6fe3d718;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:grid;gap:5px;animation:archiveMenuIn .18s ease-out}.archive-picker-menu[hidden]{display:none}@keyframes archiveMenuIn{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:none}}.archive-choice{display:flex;align-items:center;gap:11px;width:100%;padding:10px 11px;border:1px solid transparent;border-radius:10px;background:#ffffff06;color:#eef5ff;text-align:left;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}.archive-choice:hover,.archive-choice:focus-visible{outline:none;background:linear-gradient(100deg,#6fe3d71c,#91baff18);border-color:#6fe3d766;transform:translateX(2px)}.archive-choice-icon{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:10px;background:#91baff16;border:1px solid #91baff33;font-size:17px}.archive-choice b{display:block;font-size:12px;font-weight:750}.archive-choice small{display:block;margin-top:3px;color:#9eafc8;font-size:10px}
+
+footer{border-top:1px solid var(--line);padding:24px 0 35px;color:var(--muted);font-size:10px}.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media(max-width:760px){.wrap{width:calc(100% - 28px)}.navlinks{display:none}.hero,.loc-hero{grid-template-columns:1fr}.hero{padding:42px 0 12px}.globearea{height:230px}.globe{height:175px;width:175px;font-size:58px}.grid,.livegrid,.animgrid,.labgrid,.loc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sectionhead{display:block}.sectionhead p{margin-top:6px}.split{grid-template-columns:1fr}}
+@media(max-width:480px){.grid,.livegrid,.animgrid,.labgrid,.loc-grid{grid-template-columns:1fr}.school{max-width:170px;font-size:8px}.hero h1{font-size:51px}.stats{gap:7px}.stat{padding:12px}.stat b{font-size:20px}.stat span{font-size:9px}.nav{height:62px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}#starfield,.aurora{display:none!important}.reveal{opacity:1;transform:none}}
+
+.env-metrics .stat{min-width:0;padding:12px}
+.env-metrics .stat b{font-size:clamp(15px,2.5vw,22px);overflow-wrap:anywhere}
+.env-metrics .stat span{font-size:9px;letter-spacing:.08em}
+
+.archive-results{margin-top:12px;padding:14px;background:linear-gradient(145deg,#14243b 0%,#0c1728 100%);border:1px solid #91baff38;border-radius:16px;box-shadow:inset 0 1px 0 #ffffff0a,0 10px 26px #02071155}.archive-results[hidden]{display:none!important}.archive-results .grid{margin-top:10px}.archive-group{margin:16px 0}.archive-group h3{font-size:15px;color:#a9d8ff;margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid #91baff33}.archive-group .grid{margin-top:0}.archive-daily{margin-top:22px;padding-top:18px;border-top:1px solid #91baff33}.archive-safety{margin:10px 0;padding:10px 12px;border:1px solid #91baff33;border-radius:10px;background:#101d30;color:var(--muted);font-size:12px}
+
+
+/* Compact per-feed status chips shown beside each source/model label */
+.feed-status-pill{font-size:9px;font-weight:850;letter-spacing:.06em;padding:4px 7px;border-radius:99px;white-space:nowrap;background:#ffffff12;color:var(--muted)}
+.feed-status-pill.live{background:#8ce0b51a;color:#8ce0b5;border:1px solid #8ce0b544}.feed-status-pill.retrying{background:#ffcf7018;color:#ffcf70;border:1px solid #ffcf7044}.feed-status-pill.delayed{background:#ffcf7018;color:#ffcf70;border:1px solid #ffcf7044}.feed-status-pill.offline{background:#ff8b8b18;color:#ff8b8b;border:1px solid #ff8b8b44}.feed-status-pill.checking{background:#91baff18;color:#a9caff;border:1px solid #91baff44}.feed-status-pill.static{background:#bba5ff18;color:#cbbdff;border:1px solid #bba5ff44}.inline-feed-pill{font-size:8px;padding:2px 6px;letter-spacing:.045em;flex:0 0 auto;line-height:1.35}.livehead .inline-feed-pill{margin-left:auto}.holo-copy .holo-legend .inline-feed-pill{margin-left:0}
+
+</style></head>
+<body>
+<canvas id="starfield" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"></div>
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+<header><div class="wrap nav"><div class="brand"><div class="logo">N</div>NEXORA</div><nav class="navlinks"><a href="#live">Live data</a><button class="navbtn" id="navLocationBtn" type="button">Location</button><a href="#explore">Explore</a><a href="#visuals">Animations</a><a href="#animation-lab">Animation lab</a><a href="#field-notes">Field notes</a></nav><div class="school">ST JOSEPH'S CONVENT SCHOOL<br>NIT-5 · FARIDABAD</div></div></header>
+
+<main class="wrap">
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow">The world information network</div>
+    <h1>Explore more.<br><span>Know better.</span></h1>
+    <p>A student-built discovery platform connecting countries, space, technology and science. Explore detailed explainers, interactive country profiles, real live telemetry and visual demonstrations.</p>
+    <div class="actions">
+      <a class="btn primary" href="#explore">Explore the network ↗</a>
+      <a class="btn" href="#live">Open live centre</a>
+      <button class="btn" id="heroLocBtn" type="button">📍 Switch location</button>
+    </div>
+  </div>
+  <div class="globearea">
+    <div class="globe-aura"></div>
+    <div class="globe">🌐</div>
+    <div class="float f1">◉ GLOBAL DATA</div>
+    <div class="float f2">✦ SPACE &amp; SCIENCE</div>
+    <div class="float f3">⌘ DISCOVERY NETWORK</div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat reveal"><b id="countryTotal">195+</b><span>COUNTRIES &amp; TERRITORIES</span></div>
+  <div class="stat reveal"><b id="quakeTotal">—</b><span>EARTHQUAKES · PAST 24 HOURS</span></div>
+  <div class="stat reveal"><b id="liveFeedsOnline">—</b><span>LIVE FEEDS CONNECTED</span></div>
+</section>
+
+<section class="section" id="live">
+<div class="sectionhead">
+  <div><div class="eyebrow">Connected public data sources</div><h2>Live information centre</h2></div>
+  <div class="livecontrols">
+    <button class="loc-trigger" id="openLocationPage" type="button" aria-label="Open themed location changer page">
+      <span class="loc-pin"></span>
+      <span id="activeLocLabel">Faridabad (NIT-5), IN</span>
+      <span class="loc-badge-sub">Change location ▾</span>
+    </button>
+    <button class="btn" id="refresh" type="button">↻ Refresh all feeds</button>
+  </div>
+</div>
+
+<div class="livebar">
+  <span><span class="pulse-dot"></span>Auto-refresh schedule · ISS (15s) · Space Weather (60s) · Quakes (2m) · Weather &amp; AQI (5m) · Events (10m)</span>
+  <span id="syncSummary">Connecting to live feeds…</span>
+</div>
+
+<div class="live-subhead" id="local-weather-heading"><div class="eyebrow">Local conditions · selected place or GPS</div><h3>🌦 Weather for one location</h3><p class="detail">Temperature, humidity, wind, UV, air quality and rainfall forecasts for the place selected above. These are model-based estimates, not measurements from a sensor at your phone.</p></div>
+<div class="livegrid weather-grid">
+  <div class="livecard reveal" id="cardWeather">
+    <div class="livehead"><span id="weatherTitle">🌦 Faridabad weather</span> <span class="livebadge model">MODEL</span></div>
+    <div class="livevalue-row"><div class="livevalue" id="temp">--°C</div><span class="wx-anim" id="wxIcon">🌦️</span></div>
+    <div class="livesub" id="weatherExtra">Loading current conditions…</div>
+    <div class="status" id="weatherStatus">Open-Meteo forecast model</div>
+  </div>
+
+  <div class="livecard reveal" id="cardAQI">
+    <div class="livehead"><span id="aqiTitle">🌫 Air quality</span> <span class="livebadge model">MODEL</span></div>
+    <div class="livevalue" id="aqi">--</div>
+    <div class="meter-track" aria-hidden="true"><div class="meter-dot" id="aqiDot"></div></div>
+    <div class="livesub" id="aqiExtra">US AQI &amp; European AQI · loading…</div>
+    <div class="status" id="aqiStatus">Copernicus CAMS / Open-Meteo</div>
+  </div>
+
+  <div class="livecard reveal" id="cardUV">
+    <div class="livehead"><span id="uvTitle">☀️ UV &amp; daylight</span> <span class="livebadge model">MODEL</span></div>
+    <div class="livevalue" id="uv">--</div>
+    <div class="meter-track" aria-hidden="true"><div class="meter-dot" id="uvDot"></div></div>
+    <div class="livesub" id="uvExtra">Sunrise &amp; sunset loading…</div>
+    <div class="status" id="uvStatus">Open-Meteo hourly/daily</div>
+  </div>
+
+  <div class="livecard reveal" id="cardWind">
+    <div class="livehead"><span id="windTitle">🌬 Wind &amp; pressure</span> <span class="livebadge model">MODEL</span></div>
+    <div class="livevalue-row"><div class="livevalue" id="wind">-- km/h</div><div class="compass-badge" id="windCompass" title="Wind bearing">➤</div></div>
+    <div class="livesub" id="windExtra">Gusts &amp; surface pressure loading…</div>
+    <div class="status" id="windStatus">Loading…</div>
+  </div>
+
+  <div class="livecard reveal" id="cardRain">
+    <div class="livehead"><span id="rainTitle">🌧 Rain forecast</span> <span class="livebadge model">MODEL</span></div>
+    <div class="livevalue" id="rainNow">-- mm</div>
+    <div class="livesub" id="rainStatus">Loading next 6 hours…</div>
+    <div class="chart-bars" id="rainBars" aria-label="Rain forecast bar chart"></div>
+    <div class="chart-labels" id="rainLabels"><span>Now</span><span>+3 h</span><span>+6 h</span></div>
+  </div>
+
+</div>
+
+<div class="live-subhead" id="world-events-heading"><div class="eyebrow">Worldwide monitoring · not tied to your location</div><h3>🌍 Global telemetry and event feeds</h3><p class="detail">Earthquakes and natural events are worldwide feeds. Changing your local weather location does not filter or alter these events.</p></div>
+
+<div class="event-holo panel reveal" id="eventHoloPanel">
+  <div class="holo-visual">
+    <span class="holo-tag">NEXORA · EARTH LIVE</span>
+    <canvas id="eventEarthCanvas" width="520" height="520" role="img" tabindex="0" aria-label="Rotating satellite-textured Earth with clickable live event markers. Select a marker to read its details."></canvas>
+    <div class="holo-detail" id="holoEventDetail" aria-live="polite" role="dialog" aria-label="Selected event details">
+      <div class="holo-detail-head"><b id="holoDetailTitle"></b><button class="holo-close" type="button" aria-label="Close event details" onclick="closeHoloEvent()">×</button></div>
+      <p id="holoDetailText"></p><a id="holoDetailLink" href="#" target="_blank" rel="noopener noreferrer">Open source details ↗</a>
+    </div>
+  </div>
+  <div class="holo-copy">
+    <div class="eyebrow">Interactive global event map</div>
+    <h3>🌐 Earth hologram · live event locations</h3>
+    <p>NASA satellite-textured Earth with real Natural Earth coastline outlines and event points plotted from reported coordinates. Tap a point to open its details beside the marker; the globe pauses while you read.</p>
+    <div class="holo-meta"><span class="holo-count" id="holoEventCount">Connecting to event feeds…</span><span class="holo-updated" id="holoUpdated">Waiting for live coordinates</span></div>
+    <div class="holo-legend"><span><i class="holo-dot quake"></i>Earthquakes</span><span><i class="holo-dot natural"></i>Other natural events</span><span><i class="holo-dot human"></i>Human-made news reports</span></div>
+    <div class="holo-note">Earth surface: NASA Blue Marble: Next Generation with Natural Earth coastline geometry. New event dots fade in as feeds update and outdated dots fade out smoothly; live feeds refresh from USGS every 2 minutes, NASA EONET every 15 minutes and GDELT every 15 minutes. News-based locations are media reports, not independently verified incident alerts. Feed coverage and update times vary. <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/" target="_blank" rel="noopener noreferrer">NASA imagery source ↗</a></div>
+  </div>
+</div>
+
+<div class="livegrid global-live-grid">
+  <div class="livecard reveal" id="cardISS">
+    <div class="livehead">🛰 ISS live telemetry <span class="livebadge">WHERE THE ISS AT?</span></div>
+    <div class="livevalue" id="issAlt">-- km</div>
+    <div class="livesub" id="issCoords">Loading orbital position &amp; speed…</div>
+    <div class="status" id="issStatus">Where the ISS at?</div>
+  </div>
+
+  <div class="livecard reveal" id="cardKP">
+    <div class="livehead">🌞 Space weather (Kp) <span class="livebadge noaa">NOAA SWPC</span></div>
+    <div class="livevalue" id="kpVal">--</div>
+    <div class="kp-bars" id="kpBars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="livesub" id="kpExtra">Loading solar wind &amp; IMF…</div>
+    <div class="status" id="kpStatus">NOAA Space Weather Prediction Center</div>
+  </div>
+
+  <div class="livecard reveal" id="cardQuake">
+    <div class="livehead">🌎 Earthquakes (24h) <span class="livebadge">USGS FEED</span></div>
+    <div class="livevalue" id="quakeCount">--</div>
+    <div class="livesub" id="quakeExtra">Magnitude 2.5+ · past 24 hours</div>
+    <div class="status" id="quakeStatus">USGS public feed</div>
+  </div>
+
+  <div class="livecard reveal" id="cardEvent">
+    <div class="livehead">🔥 Active natural events <span class="livebadge">NASA EONET</span></div>
+    <div class="livevalue" id="eventCount">--</div>
+    <div class="livesub" id="eventExtra">Open events tracked (last 30 days)</div>
+    <div class="status" id="eventStatus">NASA EONET v3</div>
+  </div>
+
+  <div class="livecard reveal" id="cardCO2">
+    <div class="livehead">🌱 Atmospheric CO₂ <span class="livebadge noaa">OBSERVATION SERIES</span></div>
+    <div class="livevalue" id="co2Val">-- ppm</div>
+    <div class="livesub" id="co2Extra">Mauna Loa global trend loading…</div>
+    <div class="status" id="co2Status">NOAA Global Monitoring Lab</div>
+  </div>
+
+  <div class="livecard reveal" id="cardFX">
+    <div class="livehead">💱 Exchange rates (USD) <span class="livebadge">DAILY REFERENCE</span></div>
+    <div class="livevalue" id="fxMain">₹--</div>
+    <div class="fxlist" id="fxGrid"><div>EUR: —</div><div>GBP: —</div><div>JPY: —</div><div>1 USD base</div></div>
+    <div class="toolbar" style="margin-top:9px;gap:6px;flex-wrap:wrap">
+      <input id="fxAmount" class="search" type="number" min="0" step="any" value="1" aria-label="Amount to convert" style="min-width:75px;flex:1">
+      <select id="fxBase" class="select chooser-native" aria-label="Base currency"><option>USD</option><option>INR</option><option>EUR</option><option>GBP</option><option>JPY</option></select><button class="loc-trigger chooser-trigger" id="fxBasePick" type="button"><span class="loc-pin"></span><span id="fxBaseLabel">USD</span><span class="loc-badge-sub">Change ▾</span></button>
+      <span style="align-self:center">→</span>
+      <select id="fxTarget" class="select chooser-native" aria-label="Target currency"><option>INR</option><option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option></select><button class="loc-trigger chooser-trigger" id="fxTargetPick" type="button"><span class="loc-pin"></span><span id="fxTargetLabel">INR</span><span class="loc-badge-sub">Change ▾</span></button>
+      <button class="btn" id="fxConvertBtn" type="button">Convert</button>
+    </div>
+    <div class="livesub" id="fxResult" aria-live="polite">Choose currencies to convert</div>
+    <div class="status" id="fxStatus">Frankfurter / Central Bank rates</div>
+  </div>
+
+  <div class="livecard reveal">
+    <div class="livehead">🕒 Synchronized clocks <span class="livebadge">LIVE CLOCK</span></div>
+    <div class="livevalue" id="clockIST">--:--:--</div>
+    <div class="fxlist" id="worldClocks"><div>UTC: —</div><div>NYC: —</div><div>LON: —</div><div>TYO: —</div></div>
+    <div class="toolbar" style="margin-top:9px;gap:6px"><select id="clockZoneSelect" class="select chooser-native" aria-label="Choose a time zone"><option value="Asia/Kolkata">India · Kolkata</option><option value="Asia/Dubai">Dubai</option><option value="Asia/Singapore">Singapore</option><option value="Asia/Tokyo">Tokyo</option><option value="Asia/Seoul">Seoul</option><option value="Asia/Shanghai">Beijing / Shanghai</option><option value="Asia/Hong_Kong">Hong Kong</option><option value="Asia/Bangkok">Bangkok</option><option value="Asia/Jakarta">Jakarta</option><option value="Asia/Kathmandu">Kathmandu</option><option value="Asia/Dhaka">Dhaka</option><option value="Asia/Karachi">Karachi</option><option value="Asia/Riyadh">Riyadh</option><option value="Europe/London">London</option><option value="Europe/Paris">Paris</option><option value="Europe/Berlin">Berlin</option><option value="Europe/Moscow">Moscow</option><option value="Africa/Cairo">Cairo</option><option value="Africa/Johannesburg">Johannesburg</option><option value="America/New_York">New York</option><option value="America/Chicago">Chicago</option><option value="America/Denver">Denver</option><option value="America/Los_Angeles">Los Angeles</option><option value="America/Toronto">Toronto</option><option value="America/Sao_Paulo">São Paulo</option><option value="Australia/Sydney">Sydney</option><option value="Pacific/Auckland">Auckland</option><option value="UTC">UTC</option></select><button class="loc-trigger chooser-trigger" id="clockZonePick" type="button"><span class="loc-pin"></span><span id="clockZoneLabel">India · Kolkata</span><span class="loc-badge-sub">Change ▾</span></button><button class="btn" id="addClockBtn" type="button">＋ Add clock</button></div>
+    <div class="status" id="clockDate">IST · Faridabad, India</div>
+  </div>
+</div>
+
+<div class="split" style="margin-top:12px">
+  <div class="panel reveal">
+    <div class="eyebrow">NASA EONET · curated natural-event catalogue</div>
+    <h3 style="margin:5px 0">Open natural events around the world</h3>
+    <p class="detail">Latest reported open natural events from NASA’s curated catalogue (past 30 days). Each entry links to its source record; the feed checks every 15 minutes while this page is open. Coverage is not exhaustive and this is not an emergency alert service.</p>
+    <div class="event-list" id="eventList"><p class="detail">Loading NASA event records…</p></div>
+  </div>
+  <div class="panel reveal">
+    <div class="eyebrow">Wikimedia REST API · Updated daily (UTC)</div>
+    <h3 style="margin:5px 0">Global knowledge pulse today</h3>
+    <p class="detail" id="wikiStatus">Loading today's featured encyclopedia entry and most-read topics…</p><div class="detail" id="wikiHeadline">Today’s featured knowledge and most-read topics will appear here with source links.</div>
+    <div class="event-list" id="wikiList"></div>
+  </div>
+</div>
+
+<p class="source">Location detection requires your explicit browser/device permission and a secure context (HTTPS). Browser geolocation may use GPS, Wi-Fi or mobile networks; accuracy varies by device and surroundings. NEXORA stores the chosen coordinates only in this browser’s local storage. Weather and air quality are forecast/Copernicus CAMS model estimates for the selected coordinates, not a physical rooftop sensor. Live data sources and source notes: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · <a href="https://wheretheiss.at/" target="_blank" rel="noopener noreferrer">Where the ISS at?</a> · <a href="https://www.swpc.noaa.gov/" target="_blank" rel="noopener noreferrer">NOAA SWPC</a> · <a href="https://earthquake.usgs.gov/earthquakes/feed/" target="_blank" rel="noopener noreferrer">USGS</a> · <a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA EONET</a> · <a href="https://global-warming.org/" target="_blank" rel="noopener noreferrer">CO₂ data aggregator</a> · <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer">NOAA GML reference</a> · <a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter (ECB)</a> · <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer">Wikipedia</a>.</p>
+</section>
+
+<section class="section" id="explore"><div class="sectionhead"><div><div class="eyebrow">The discovery index</div><h2>Explore the network</h2></div><p>Choose a section. Search and open individual explainers.</p></div>
+<div class="subnav"><a href="#live">Live data</a><a href="#visuals">Science animations</a><a href="#animation-lab">Interactive lab</a><a href="#field-notes">Field notes</a></div><div class="tabs" id="tabs"><button class="tab active" data-tab="world">🌍 World Explorer</button><button class="tab" data-tab="space">🪐 Space &amp; Universe</button><button class="tab" data-tab="technology">⌘ Technology Index</button><button class="tab" data-tab="science">⚛ Science Monitor</button><button class="tab" data-tab="archive">▤ Discovery Archive</button></div>
+<div class="tabpanel" id="panel-world">
+ <div class="panel reveal"><div class="eyebrow">Interactive country directory</div><h3 style="margin:5px 0">Explore countries around the world</h3><p class="detail">Search by country, capital or currency. Select a country name to open its profile with facts, geography, population and official data links. If the live country service is unavailable, the built-in sample directory still works.</p><div class="toolbar"><input class="search" id="countrySearch" placeholder="Try India, Japan, New Delhi, yen…" aria-label="Search countries"><select class="select" id="region"><option value="all">All regions</option><option>Africa</option><option>Americas</option><option>Asia</option><option>Europe</option><option>Oceania</option></select><select class="select" id="sort"><option value="name">Sort: A–Z</option><option value="population">Population: high to low</option><option value="area">Area: large to small</option></select></div><div class="detail" id="countryStatus" aria-live="polite">Preparing country directory…</div></div>
+ <div class="tablewrap" style="margin-top:12px"><table class="dataTable"><thead><tr><th>Country</th><th>Capital</th><th>Region</th><th>Population</th><th>Area (km²)</th><th>Currency</th></tr></thead><tbody id="countryRows"></tbody></table></div><div class="pager"><span id="pageInfo">Showing country records</span><span><button id="prev">← Previous</button> <button id="next">Next →</button></span></div>
+ <div class="split" style="margin-top:14px"><div class="panel"><div class="eyebrow">How to read the data</div><h3>Population is an estimate</h3><p class="detail">Population totals change continuously and national statistical offices update them at different times. A country database may show its latest available estimate, not a live headcount. Area is a reference value and may vary by definition.</p></div><div class="panel"><div class="eyebrow">Explore original data</div><h3>Verify a country profile</h3><p class="detail">Use official national statistics, the United Nations and the World Bank when citing population or development indicators in a school project.</p><a href="https://data.worldbank.org/country" target="_blank" rel="noopener noreferrer">World Bank country data ↗</a></div></div>
+</div>
+<div class="tabpanel" id="panel-space" hidden>
+ <div class="split">
+  <div class="panel"><div class="eyebrow">Live orbital observation</div><h3>International Space Station</h3><div class="livevalue" id="issAlt2">-- km</div><p class="detail" id="issCoord2">Current position loading…</p><div class="detail" id="issUpdated">Waiting for the latest telemetry…</div><a id="issMap" href="https://wheretheiss.at/" target="_blank" rel="noopener noreferrer">View position on map ↗</a></div>
+  <div class="panel"><div class="eyebrow">NOAA SWPC · Solar observations</div><h3>Sun-Earth environment</h3><div class="livevalue" id="spaceWeatherTab">Kp --</div><p class="detail" id="spaceWeatherDetail">Loading live solar wind and interplanetary magnetic field…</p>
+   <div class="grid env-metrics" style="grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0">
+    <div class="stat"><b id="solarWindMetric">—</b><span>SOLAR WIND · KM/S</span></div><div class="stat"><b id="imfMetric">—</b><span>IMF BZ · NT</span></div><div class="stat"><b id="xrayMetric">—</b><span>GOES X-RAY FLUX</span></div><div class="stat"><b id="kpMetric">—</b><span>PLANETARY KP</span></div>
+   </div><div class="detail" id="spaceWeatherUpdated">Waiting for NOAA observations…</div><a href="https://www.swpc.noaa.gov/" target="_blank" rel="noopener noreferrer">NOAA Space Weather Center ↗</a> · <a href="https://services.swpc.noaa.gov/json/goes/primary/xrays-7-day.json" target="_blank" rel="noopener noreferrer">GOES X-ray data ↗</a>
+  </div>
+ </div>
+ <div class="panel" style="margin-top:12px"><div class="eyebrow">Earth environment · live public indicators</div><h3>What is happening around Earth?</h3><p class="detail" id="earthEnvironmentStatus">Loading current Earth and atmosphere indicators…</p><div class="grid env-metrics" style="grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0"><div class="stat"><b id="earthQuakeMetric">—</b><span>USGS M2.5+ · PAST 24H</span></div><div class="stat"><b id="earthEventMetric">—</b><span>NASA OPEN NATURAL EVENTS</span></div><div class="stat"><b id="earthCO2Metric">—</b><span>LAST CO₂ OBSERVATION · PPM</span></div><div class="stat"><b id="earthAQIMetric">—</b><span>SELECTED-PLACE AIR QUALITY</span></div></div><p class="detail">Earthquake and natural-event feeds are global. Air quality is for the currently selected weather location. CO₂ readings are observation-series data and may be delayed.</p><a href="https://earthquake.usgs.gov/earthquakes/feed/" target="_blank" rel="noopener noreferrer">USGS earthquake feeds ↗</a> · <a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA natural events ↗</a> · <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener noreferrer">NOAA CO₂ trends ↗</a>
+ </div>
+ <div class="grid" id="spaceCards" style="margin-top:12px"></div>
+</div>
+<div class="tabpanel" id="panel-technology" hidden><div class="panel"><div class="eyebrow">Open-source software activity · GitHub public data</div><h3>Explore real public projects</h3><p class="detail">Search public GitHub repositories to see project descriptions, programming languages, stars and last update. Stars are a platform signal, not a quality or security guarantee.</p><div class="toolbar"><input class="search" id="repoSearch" placeholder="Try robotics, Python, web browser, Linux…"><button class="btn" id="repoButton">Search projects</button></div><div class="detail" id="repoStatus">Loading public project directory…</div></div><div class="panel" style="margin-top:12px"><div class="eyebrow">Daily project discovery</div><h3>Recently updated open-source projects</h3><p class="detail">Latest public GitHub projects created within the past seven days. The feed checks again throughout the day; projects are not endorsed or security-audited by NEXORA. Every result links to its original repository.</p><div class="archive-safety">Safety note: NEXORA links to public project pages only. A repository is not guaranteed virus-free or safe just because it is hosted on GitHub. Do not download or run unknown files; review the source, maintainer history, releases and security notices, and use trusted security tools before installing anything.</div><div class="detail" id="dailyProjectsStatus">Loading recent project activity…</div><div class="detail" id="dailyProjectsHeadline">Latest public project discoveries will appear here.</div></div><div class="grid" id="dailyProjectCards" style="margin-top:12px"></div><div class="grid" id="repoCards" style="margin-top:12px"></div><div class="grid" id="techCards" style="margin-top:12px"></div></div>
+<div class="tabpanel" id="panel-science" hidden><div class="panel"><div class="eyebrow">US Geological Survey · live feed</div><h3>Recent earthquake activity</h3><p class="detail">Events with magnitude 2.5 or greater in the past day. An earthquake feed reports detected events; it does not predict earthquakes or indicate that an event is imminent.</p><div class="detail" id="quakeStatus2">Loading recent events…</div></div><div class="tablewrap" style="margin-top:12px"><table class="dataTable"><thead><tr><th>Magnitude</th><th>Location</th><th>Time (UTC)</th><th>Depth</th><th>Source</th></tr></thead><tbody id="quakeRows"></tbody></table></div><div class="grid" id="scienceCards" style="margin-top:12px"></div></div>
+<div class="tabpanel" id="panel-archive" hidden>
+ <div class="panel"><div class="eyebrow">Reference library · curated explainers</div><h3>Discovery archive</h3><p class="detail">Select a category to reveal its trusted educational information. The archive stays compact until you choose a topic.</p><div class="archive-picker" id="archivePicker">
+  <button class="loc-trigger archive-picker-trigger" id="archiveCategoryPick" type="button" aria-haspopup="dialog" aria-controls="archiveCategoryPage">
+   <span class="loc-pin"></span><span id="archiveCategoryLabel">✦ Select a category…</span><span class="loc-badge-sub">Open archive hub ↗</span>
+  </button>
+ </div></div>
+ <div class="panel archive-results" id="archiveResults" hidden><div class="eyebrow" id="archiveResultsEyebrow">Selected archive topic</div><div class="detail" id="archiveSearchStatus" aria-live="polite"></div><div class="grid" id="archiveGroups"></div></div>
+ <section class="archive-daily" id="archiveDailyFacts"><div class="eyebrow">Daily knowledge · Wikimedia</div><h3 style="margin:5px 0">Today’s fact</h3><p class="detail">A new fact for today, drawn from Wikimedia’s date-based historical feed and linked to its reference. The selection changes with the calendar date; these are historical facts, not breaking-news reports.</p><div class="detail" id="dailyArchiveStatus">Loading today’s daily facts…</div><div class="detail" id="dailyFactHeadline">Today’s historical facts will appear here with references.</div><div class="grid" id="dailyArchiveCards" style="margin:12px 0"></div></section>
+</div>
+</section>
+
+<section class="section" id="visuals"><div class="sectionhead"><div><div class="eyebrow">See the science</div><h2>Animated explainers</h2></div><p>Small visual models that make complex ideas easier to understand.</p></div><div class="animgrid">
+<div class="anim reveal"><h3>🪐 Planetary orbit</h3><div class="orbitdemo"><div class="sun"></div><div class="planetorbit"><div class="planet"></div></div></div><p>A planet's gravity toward the Sun and its sideways motion combine to create an orbit. The animation is a simplified illustration, not to scale.</p></div>
+<div class="anim reveal"><h3>💧 The water cycle</h3><div class="waterdemo"><div class="cloud">☁️</div><div class="rain">💧</div></div><p>Sunlight drives evaporation. Water vapour cools and condenses into clouds; precipitation returns water to land and oceans.</p></div>
+<div class="anim reveal"><h3>🌎 Seismic waves</h3><div class="quakeDemo"><div class="quakeLine"></div><div class="pulse"></div></div><p>Earthquake waves spread outward from a source. Seismometers record ground motion to help scientists study an event.</p></div>
+</div></section>
+
+<section class="section" id="animation-lab"><div class="sectionhead"><div><div class="eyebrow">Made to move · no external video links</div><h2>Interactive animation lab</h2></div><p>Explore science and technology through animations running directly on this page.</p></div><div class="labgrid">
+<div class="labcard reveal"><h3>🧬 DNA double helix</h3><div class="dna-stage" aria-label="Animated DNA double helix illustration"><span class="dna-pair" style="--i:0"><i></i></span><span class="dna-pair" style="--i:1"><i></i></span><span class="dna-pair" style="--i:2"><i></i></span><span class="dna-pair" style="--i:3"><i></i></span><span class="dna-pair" style="--i:4"><i></i></span><span class="dna-pair" style="--i:5"><i></i></span><span class="dna-pair" style="--i:6"><i></i></span><span class="dna-pair" style="--i:7"><i></i></span><span class="dna-pair" style="--i:8"><i></i></span><span class="dna-pair" style="--i:9"><i></i></span><span class="dna-pair" style="--i:10"><i></i></span><span class="dna-pair" style="--i:11"><i></i></span></div><p>DNA stores hereditary information. Its two strands are connected by pairs of chemical bases.</p></div>
+<div class="labcard reveal"><h3>🛰️ Satellite orbit</h3><div class="satellite-stage" aria-label="Satellite moving around Earth"><div class="earth">🌍</div><div class="sat-orbit"></div></div><p>A satellite remains in orbit because its forward motion and Earth's gravity act together.</p></div>
+<div class="labcard reveal"><h3>🌐 Connected network</h3><div class="network-stage" aria-label="Animated network nodes exchanging signals"><div class="net-core">⌘</div><span class="net-node"></span><span class="net-node"></span><span class="net-node"></span><span class="net-node"></span><span class="net-line l1"></span><span class="net-line l2"></span></div><p>Computers exchange information through connected networks using shared communication protocols.</p></div>
+</div><div class="labgrid" style="margin-top:12px">
+ <div class="labcard reveal"><h3>🌋 Moving tectonic plates</h3><div class="plate-stage"><div class="plate left"></div><div class="plate right"></div><div class="magma"></div></div><p>Earth's lithosphere is divided into plates. Their interactions help form mountains, trenches, volcanoes and earthquakes.</p></div>
+ <div class="labcard reveal"><h3>🌬 Wind energy</h3><div class="wind-stage"><div class="tower"></div><div class="blades"></div><div class="windhub"></div></div><p>Wind turns turbine blades. A generator converts the rotating motion into electrical energy.</p></div>
+ <div class="labcard reveal"><h3>🌱 Carbon cycle</h3><div class="co2-stage"><div class="co2bubble">CO₂</div><div class="co2arrow">→</div><div class="co2bubble">🌿</div><div class="co2arrow">→</div><div class="co2bubble">O₂</div></div><p>Plants take in carbon dioxide during photosynthesis. Carbon also moves through organisms, soil, oceans and the atmosphere.</p></div>
+ </div><p class="source">These are lightweight CSS animations built into NEXORA. They run locally in the browser and do not need external video links.</p></section>
+
+<section class="section" id="field-notes"><div class="sectionhead"><div><div class="eyebrow">Understand the bigger picture</div><h2>Planet systems · field notes</h2></div><p>How science, technology and the environment connect.</p></div>
+<p class="section-intro">These field notes connect natural systems with the technologies people use to observe and protect them.</p><div class="grid">
+<article class="tile reveal"><div class="tiletop"><div class="emoji">🌳</div><span class="pill">ENVIRONMENT</span></div><h3>Forests and climate</h3><p>Forests store carbon, regulate local water cycles, protect soil and provide habitat. Deforestation can release stored carbon and fragment ecosystems.</p><a href="https://www.fao.org/forestry/" target="_blank" rel="noopener noreferrer">FAO forest resources ↗</a></article>
+<article class="tile reveal"><div class="tiletop"><div class="emoji">🛰️</div><span class="pill">EARTH OBSERVATION</span></div><h3>How satellites monitor Earth</h3><p>Satellites measure cloud cover, vegetation, ocean temperature and land change. Repeated observations help researchers identify patterns.</p><a href="https://earthobservatory.nasa.gov/" target="_blank" rel="noopener noreferrer">NASA Earth Observatory ↗</a></article>
+<article class="tile reveal"><div class="tiletop"><div class="emoji">♻️</div><span class="pill">SUSTAINABILITY</span></div><h3>Circular economy</h3><p>A circular approach aims to reduce waste by designing durable products, repairing, reusing and recycling materials where practical.</p><a href="https://www.unep.org/" target="_blank" rel="noopener noreferrer">UN Environment Programme ↗</a></article>
+<article class="tile reveal"><div class="tiletop"><div class="emoji">💧</div><span class="pill">WATER</span></div><h3>Freshwater is limited</h3><p>Most of Earth's water is saline. A relatively small share is freshwater, and much of that is stored in ice or underground.</p><a href="https://www.unwater.org/" target="_blank" rel="noopener noreferrer">UN-Water ↗</a></article>
+<article class="tile reveal"><div class="tiletop"><div class="emoji">📡</div><span class="pill">COMPUTER SCIENCE</span></div><h3>Open data and APIs</h3><p>An API lets software request structured information from another service. Open data can support research, dashboards and public understanding.</p><a href="https://www.data.gov.in/" target="_blank" rel="noopener noreferrer">India Open Government Data ↗</a></article>
+<article class="tile reveal"><div class="tiletop"><div class="emoji">⚡</div><span class="pill">ENERGY</span></div><h3>Energy transition</h3><p>Electricity systems combine generation, transmission, storage and demand. Cleaner energy also requires planning for reliability and materials.</p><a href="https://www.iea.org/" target="_blank" rel="noopener noreferrer">International Energy Agency ↗</a></article>
+</div></section>
+
+<section class="section" id="about"><div class="panel reveal"><div class="eyebrow">Created for discovery</div><h2 style="margin:6px 0">NEXORA</h2><p class="detail">A student-created information network by <strong>St Joseph's Convent School, NIT-5, Faridabad</strong>. The project demonstrates how web interfaces, real public APIs, data tables, search, animation and source attribution turn live information into an interactive learning experience.</p><p class="detail">Live data can be delayed or temporarily unavailable depending on network conditions. Reference facts are educational summaries, not live measurements. Always check original sources before citing statistics.</p><div class="source">Public sources include REST Countries, Open-Meteo (forecast/model data and geocoding), NOAA SWPC, NOAA GML reference series, USGS, NASA EONET, Where the ISS at?, Frankfurter (central-bank reference exchange rates), Wikimedia daily featured/on-this-day feeds, GitHub repository activity and the World Bank. Some services are aggregators or models; source timestamps and update schedules vary.</div></div></section>
+</main>
+
+<footer><div class="wrap foot"><span>© 2026 NEXORA 2.0 · ST JOSEPH'S CONVENT SCHOOL, NIT-5, FARIDABAD</span><span>Curiosity, connected.</span></div></footer>
+
+<!-- THEMED LOCATION CHANGING PAGE -->
+<div class="loc-page" id="locationPage" role="dialog" aria-modal="true" aria-labelledby="locPageTitle">
+  <div class="loc-shell">
+    <div class="loc-topbar">
+      <div class="brand"><div class="logo">N</div>NEXORA · LOCATION HUB</div>
+      <button class="btn" id="closeLocationPage" type="button">← Back to Live Centre</button>
+    </div>
+
+    <div class="loc-hero">
+      <div class="loc-active-hud">
+        <div>
+          <div class="eyebrow">Active observation coordinates</div>
+          <h2 id="locPageTitle" style="margin:6px 0 4px;font-size:26px;letter-spacing:-.04em">🇮🇳 Faridabad (NIT-5)</h2>
+          <p class="detail" id="locHudMeta" style="margin:0">Haryana, India · 28.4089° N, 77.3178° E</p>
+          <p class="source" style="margin-top:8px">Updates live Weather, Air Quality, UV &amp; Daylight, Wind &amp; Pressure, and 6-Hour Rain Forecast.</p>
+        </div>
+        <div class="radar" aria-hidden="true">
+          <div class="radar-sweep"></div>
+          <div class="radar-center">📡</div>
+        </div>
+      </div>
+
+      <div class="loc-gps-box">
+        <div>
+          <div class="eyebrow">Automatic detection</div>
+          <h3 style="margin:5px 0">Use your current GPS location</h3>
+          <p class="detail" id="gpsStatus" style="margin:0">Allow location access in your browser or phone settings. If access was denied earlier, change this site’s Location permission to Allow, then try again. GPS may use nearby Wi-Fi or mobile networks too.</p>
+        </div>
+        <button class="btn primary" id="detectGpsBtn" type="button">🛰️ Detect my location</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="eyebrow">Global geocoding search</div>
+      <h3 style="margin:5px 0">Search any city or town on Earth</h3>
+      <div class="loc-search-wrap">
+        <input class="search" id="locSearchInput" placeholder="Type any city — e.g. Gurugram, Jaipur, Leh, Zurich, Reykjavik, Cairo…" aria-label="Search any city worldwide">
+        <button class="btn primary" id="locSearchBtn" type="button">Search cities</button>
+      </div>
+      <div class="detail" id="locSearchStatus">Type a city name to search via Open-Meteo Global Geocoding, or pick a featured station below.</div>
+      <div class="loc-grid" id="locSearchResults" style="margin-top:12px"></div>
+    </div>
+
+    <div style="margin-top:18px">
+      <div class="sectionhead" style="margin-bottom:10px">
+        <div><div class="eyebrow">Quick stations</div><h3 style="margin:4px 0">Featured observation hubs</h3></div>
+      </div>
+      <div class="loc-chips" id="locFilterChips">
+        <button class="chip active" data-filter="all" type="button">All hubs</button>
+        <button class="chip" data-filter="India" type="button">🇮🇳 India</button>
+        <button class="chip" data-filter="Global" type="button">🌍 Global</button>
+      </div>
+      <div class="loc-grid" id="locPresetGrid"></div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loc-page" id="choicePage" role="dialog" aria-modal="true" aria-labelledby="choiceTitle">
+  <div class="loc-shell">
+    <div class="loc-topbar"><div class="brand"><div class="logo">N</div>NEXORA · SELECTOR</div><button class="btn" id="closeChoicePage" type="button">← Back</button></div>
+    <div class="loc-hero" style="grid-template-columns:1fr"><div class="loc-active-hud"><div><div class="eyebrow" id="choiceEyebrow">Personalize your view</div><h2 id="choiceTitle" style="margin:6px 0 4px;font-size:26px">Choose an option</h2><p class="detail" id="choiceDescription" style="margin:0">Select from the available options below.</p></div><div class="radar" aria-hidden="true"><div class="radar-sweep"></div><div class="radar-center">✦</div></div></div></div>
+    <div class="panel"><div class="eyebrow">Search and select</div><div class="loc-search-wrap"><input class="search" id="choiceSearch" placeholder="Search…" aria-label="Search options"></div><div class="detail" id="choiceStatus">Choose an option to continue.</div><div class="loc-grid" id="choiceGrid" style="margin-top:12px"></div></div>
+  </div>
+</div>
+
+
+<div class="loc-page" id="archiveCategoryPage" role="dialog" aria-modal="true" aria-labelledby="archivePageTitle">
+ <div class="loc-shell">
+  <div class="loc-topbar"><div class="brand"><div class="logo">N</div>NEXORA · DISCOVERY ARCHIVE</div><button class="btn" id="closeArchiveCategoryPage" type="button">← Back to Archive</button></div>
+  <div class="loc-hero" style="grid-template-columns:1fr">
+   <div class="loc-active-hud"><div><div class="eyebrow">Explore the knowledge network</div><h2 id="archivePageTitle" style="margin:6px 0 4px;font-size:26px;letter-spacing:-.04em">Choose a discovery category</h2><p class="detail" style="margin:0">Select a topic to open its collection of explainers and trusted references. Your choice will appear in the Discovery Archive.</p></div><div class="radar" aria-hidden="true"><div class="radar-sweep"></div><div class="radar-center">✦</div></div></div>
+  </div>
+  <div class="panel"><div class="eyebrow">Knowledge categories</div><h3 style="margin:5px 0">What would you like to explore?</h3><p class="detail">Choose one category below. The page will return to the archive and show only the information in that category.</p>
+   <div class="loc-grid" id="archiveCategoryGrid" style="margin-top:14px">
+    <button class="loc-card choice-card" type="button" data-category="all"><div class="loc-card-top"><span>▤ COMPLETE LIBRARY</span><span>01</span></div><h4>All topics</h4><p>Explore every archive explainer together</p></button>
+    <button class="loc-card choice-card" type="button" data-category="Earth & environment"><div class="loc-card-top"><span>🌍 PLANET SYSTEMS</span><span>02</span></div><h4>Earth &amp; environment</h4><p>Our planet, climate, oceans and ecosystems</p></button>
+    <button class="loc-card choice-card" type="button" data-category="Space & astronomy"><div class="loc-card-top"><span>🪐 BEYOND EARTH</span><span>03</span></div><h4>Space &amp; astronomy</h4><p>Stars, planets, galaxies and exploration</p></button>
+    <button class="loc-card choice-card" type="button" data-category="Science & life"><div class="loc-card-top"><span>🧬 LIVING WORLD</span><span>04</span></div><h4>Science &amp; life</h4><p>Nature, biology and scientific discovery</p></button>
+    <button class="loc-card choice-card" type="button" data-category="Technology & engineering"><div class="loc-card-top"><span>⚙ INNOVATION</span><span>05</span></div><h4>Technology &amp; engineering</h4><p>Ideas, machines, computing and invention</p></button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox"><button class="close" id="close">Close ✕</button><div class="eyebrow">NEXORA PROFILE</div><div id="modalContent"></div></div></div>
+
+<script>
+const $=id=>document.getElementById(id),
+  fmt=n=>Number(n||0).toLocaleString("en-IN"),
+  esc=s=>String(s??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),
+  safeUrl=u=>/^https?:\/\//i.test(String(u||""))?u:"#",
+  flagOf=cc=>cc&&/^[A-Z]{2}$/i.test(cc)?[...cc.toUpperCase()].map(c=>String.fromCodePoint(127397+c.charCodeAt(0))).join(""):"📍";
+
+const nexoraInFlightRequests=new Map();
+async function json(url,timeoutMs=10000){
+  const requestKey=String(url);
+  if(nexoraInFlightRequests.has(requestKey))return nexoraInFlightRequests.get(requestKey);
+  const task=(async()=>{
+    const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),timeoutMs);
+    try{
+      const r=await fetch(url,{cache:"no-store",signal:ctrl.signal});
+      if(!r.ok)throw Error("HTTP "+r.status);
+      return await r.json();
+    }finally{clearTimeout(t)}
+  })();
+  nexoraInFlightRequests.set(requestKey,task);
+  try{return await task;}finally{if(nexoraInFlightRequests.get(requestKey)===task)nexoraInFlightRequests.delete(requestKey);}
+}
+
+/* Scroll Progress + Scroll Reveal Observer */
+window.addEventListener("scroll",()=>{
+  const h=document.documentElement;
+  const pct=h.scrollHeight-h.clientHeight>0?(h.scrollTop/(h.scrollHeight-h.clientHeight))*100:0;
+  $("scrollProgress").style.width=pct.toFixed(2)+"%";
+},{passive:true});
+
+const revObs=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      e.target.style.transitionDelay=(i%4)*55+"ms";
+      e.target.classList.add("in");
+      revObs.unobserve(e.target);
+    }
+  });
+},{threshold:0.08});
+document.querySelectorAll(".reveal").forEach(el=>revObs.observe(el));
+
+/* Ambient Starfield Constellation Canvas */
+(function initStars(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const cv=$("starfield"),ctx=cv.getContext("2d");
+  let w,h,stars=[],raf=0,running=false,lastFrame=0;
+  function resize(){
+    w=cv.width=window.innerWidth;h=cv.height=window.innerHeight;
+    const count=Math.min(42,Math.floor((w*h)/30000));
+    stars=Array.from({length:count},()=>({
+      x:Math.random()*w,y:Math.random()*h,
+      vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,
+      r:Math.random()*1.4+.5,a:Math.random()*.55+.2
+    }));
+  }
+  function tick(now=0){
+    if(!running||document.hidden)return;
+    if(now-lastFrame<33){raf=requestAnimationFrame(tick);return;}
+    lastFrame=now;
+    ctx.clearRect(0,0,w,h);
+    for(let i=0;i<stars.length;i++){
+      const s=stars[i];
+      s.x+=s.vx;s.y+=s.vy;
+      if(s.x<0||s.x>w)s.vx*=-1;
+      if(s.y<0||s.y>h)s.vy*=-1;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(180,215,255,${s.a})`;ctx.fill();
+      for(let j=i+1;j<stars.length;j++){
+        const o=stars[j],dx=s.x-o.x,dy=s.y-o.y,dist=Math.hypot(dx,dy);
+        if(dist<130){
+          ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(o.x,o.y);
+          ctx.strokeStyle=`rgba(111,227,215,${(1-dist/130)*0.12})`;
+          ctx.lineWidth=.8;ctx.stroke();
+        }
+      }
+    }
+    raf=requestAnimationFrame(tick);
+  }
+  function start(){if(running||document.hidden)return;running=true;lastFrame=0;raf=requestAnimationFrame(tick);}
+  function stop(){running=false;if(raf)cancelAnimationFrame(raf);raf=0;}
+  document.addEventListener("visibilitychange",()=>document.hidden?stop():start());
+  window.addEventListener("resize",resize,{passive:true});resize();start();
+})();
+
+/* Flash animation when live card refreshes */
+function pulseCard(id){
+  const el=$(id);if(!el)return;
+  el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");
+}
+
+/* Location State & Presets */
+const presetLocations=[
+  {id:"faridabad",name:"Faridabad (NIT-5)",sub:"Haryana, India · Campus",country:"IN",group:"India",lat:28.4089,lon:77.3178},
+  {id:"delhi",name:"New Delhi",sub:"National Capital Territory, India",country:"IN",group:"India",lat:28.6139,lon:77.2090},
+  {id:"mumbai",name:"Mumbai",sub:"Maharashtra, India",country:"IN",group:"India",lat:19.0760,lon:72.8777},
+  {id:"bengaluru",name:"Bengaluru",sub:"Karnataka, India",country:"IN",group:"India",lat:12.9716,lon:77.5946},
+  {id:"chennai",name:"Chennai",sub:"Tamil Nadu, India",country:"IN",group:"India",lat:13.0827,lon:80.2707},
+  {id:"kolkata",name:"Kolkata",sub:"West Bengal, India",country:"IN",group:"India",lat:22.5726,lon:88.3639},
+  {id:"london",name:"London",sub:"United Kingdom",country:"GB",group:"Global",lat:51.5072,lon:-0.1276},
+  {id:"tokyo",name:"Tokyo",sub:"Japan",country:"JP",group:"Global",lat:35.6762,lon:139.6503},
+  {id:"nyc",name:"New York",sub:"United States",country:"US",group:"Global",lat:40.7128,lon:-74.0060},
+  {id:"singapore",name:"Singapore",sub:"Singapore",country:"SG",group:"Global",lat:1.3521,lon:103.8198},
+  {id:"paris",name:"Paris",sub:"France",country:"FR",group:"Global",lat:48.8566,lon:2.3522},
+  {id:"sydney",name:"Sydney",sub:"Australia",country:"AU",group:"Global",lat:-33.8688,lon:151.2093}
+];
+
+let currentLocation=presetLocations[0];
+try{
+  const saved=localStorage.getItem("nexora_location");
+  if(saved){const parsed=JSON.parse(saved);if(parsed&&Number.isFinite(parsed.lat)&&Number.isFinite(parsed.lon))currentLocation=parsed;}
+}catch(e){}
+
+let locFilter="all";
+function updateLocationUI(){
+  const flag=flagOf(currentLocation.country);
+  $("activeLocLabel").textContent=`${flag} ${currentLocation.name}`;
+  $("locPageTitle").textContent=`${flag} ${currentLocation.name}`;
+  $("locHudMeta").textContent=`${currentLocation.sub||"Custom coordinates"} · ${currentLocation.lat.toFixed(4)}°, ${currentLocation.lon.toFixed(4)}°`;
+  renderPresetLocations();
+}
+
+function selectLocation(loc){
+  currentLocation=loc;
+  try{localStorage.setItem("nexora_location",JSON.stringify(loc));}catch(e){}
+  updateLocationUI();
+  closeLocPage();
+  liveWeather();
+  liveAQI();
+}
+
+function renderPresetLocations(){
+  const list=presetLocations.filter(l=>locFilter==="all"||l.group===locFilter);
+  $("locPresetGrid").innerHTML=list.map(l=>{
+    const isCur=Math.abs(l.lat-currentLocation.lat)<0.01&&Math.abs(l.lon-currentLocation.lon)<0.01;
+    return `<button class="loc-card ${isCur?"current":""}" data-preset="${esc(l.id)}" type="button">
+      <div class="loc-card-top"><span>${flagOf(l.country)} ${esc(l.group)}</span><span>${isCur?"● ACTIVE":"SELECT →"}</span></div>
+      <h4>${esc(l.name)}</h4>
+      <p>${esc(l.sub)}</p>
+      <span class="loc-coords">${l.lat.toFixed(2)}°, ${l.lon.toFixed(2)}°</span>
+    </button>`;
+  }).join("");
+}
+
+$("locPresetGrid").addEventListener("click",e=>{
+  const b=e.target.closest("[data-preset]");if(!b)return;
+  const loc=presetLocations.find(x=>x.id===b.dataset.preset);
+  if(loc)selectLocation(loc);
+});
+
+$("locFilterChips").addEventListener("click",e=>{
+  const c=e.target.closest("[data-filter]");if(!c)return;
+  locFilter=c.dataset.filter;
+  document.querySelectorAll("#locFilterChips .chip").forEach(x=>x.classList.toggle("active",x===c));
+  renderPresetLocations();
+});
+
+let searchResults=[];
+async function searchGlobalCities(){
+  const q=$("locSearchInput").value.trim();
+  if(q.length<2){$("locSearchStatus").textContent="Enter at least 2 characters to search worldwide.";$("locSearchResults").innerHTML="";return;}
+  $("locSearchStatus").textContent=`Searching global stations for "${q}"…`;
+  try{
+    const d=await json(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=en&format=json`);
+    const res=d.results||[];
+    searchResults=res.map(r=>({
+      id:"geo_"+r.id,
+      name:r.name,
+      sub:[r.admin1,r.country].filter(Boolean).join(", "),
+      country:r.country_code||"",
+      group:r.country||"Global",
+      lat:r.latitude,
+      lon:r.longitude,
+      elev:r.elevation
+    }));
+    if(!searchResults.length){
+      $("locSearchStatus").textContent=`No matching locations found for "${q}". Try another spelling.`;
+      $("locSearchResults").innerHTML="";
+      return;
+    }
+    $("locSearchStatus").textContent=`Found ${searchResults.length} location${searchResults.length>1?"s":""}. Click any card to switch all live weather & AQI feeds.`;
+    $("locSearchResults").innerHTML=searchResults.map((l,idx)=>`<button class="loc-card" data-geoidx="${idx}" type="button">
+      <div class="loc-card-top"><span>${flagOf(l.country)} ${esc(l.country||"GLOBAL")}</span><span>SWITCH →</span></div>
+      <h4>${esc(l.name)}</h4>
+      <p>${esc(l.sub||"World station")}</p>
+      <span class="loc-coords">${l.lat.toFixed(2)}°, ${l.lon.toFixed(2)}°${l.elev!=null?" · "+Math.round(l.elev)+"m":""}</span>
+    </button>`).join("");
+  }catch(e){
+    $("locSearchStatus").textContent="Geocoding service temporarily unavailable. You can still pick any featured station below.";
+  }
+}
+
+$("locSearchResults").addEventListener("click",e=>{
+  const b=e.target.closest("[data-geoidx]");if(!b)return;
+  const loc=searchResults[Number(b.dataset.geoidx)];
+  if(loc)selectLocation(loc);
+});
+$("locSearchBtn").onclick=searchGlobalCities;
+$("locSearchInput").addEventListener("keydown",e=>{if(e.key==="Enter")searchGlobalCities()});
+
+$("detectGpsBtn").onclick=()=>{
+  if(!navigator.geolocation){$("gpsStatus").textContent="Location is not supported here. Search for your city instead.";return;}
+  if(!window.isSecureContext){$("gpsStatus").textContent="Location access needs a secure HTTPS website. Open the published HTTPS version of NEXORA, then try again.";return;}
+  $("gpsStatus").textContent="Requesting location permission… Check that Location is turned on for your phone and browser.";
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude, lon=pos.coords.longitude, accuracy=Math.round(pos.coords.accuracy||0);
+    $("gpsStatus").textContent=`Location permission granted · accuracy approximately ${accuracy.toLocaleString()} m · detected ${new Date().toLocaleTimeString()}. Updating local weather only.`;
+    selectLocation({id:"gps",name:"My GPS Location",sub:`Device location · ±${accuracy} m accuracy`,country:"",group:"Global",lat,lon,accuracy,detectedAt:new Date().toISOString()});
+  },err=>{
+    if(err.code===1){
+      $("gpsStatus").textContent="Permission was blocked by your browser. On Android: open Chrome → ⋮ → Settings → Site settings → Location → allow this NEXORA site. Also turn on your phone’s Location. Then reload NEXORA and tap Detect my location again. If the permission is set to Block, this button cannot override it; search your city below meanwhile.";
+    }else if(err.code===2){
+      $("gpsStatus").textContent="Your device could not determine a location. Turn on phone Location, move near a window or outdoors, and try again — or search your city.";
+    }else{
+      $("gpsStatus").textContent="Location request timed out. Check Location is on and try again, or search your city.";
+    }
+  },{enableHighAccuracy:true,timeout:25000,maximumAge:0});
+};
+
+function openLocPage(){updateLocationUI();$("locationPage").classList.add("show");document.body.style.overflow="hidden";$("locSearchInput").focus();}
+function closeLocPage(){$("locationPage").classList.remove("show");document.body.style.overflow="";}
+$("openLocationPage").onclick=openLocPage;
+$("heroLocBtn").onclick=openLocPage;
+$("navLocationBtn").onclick=openLocPage;
+$("closeLocationPage").onclick=closeLocPage;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("modal").classList.remove("show");closeLocPage();}});
+
+/* Live Telemetry Logic + per-feed health diagnostics */
+const feedDefinitions={
+ iss:{label:"ISS position telemetry",interval:15000,kind:"live"},noaa:{label:"NOAA space weather",interval:60000,kind:"live"},usgs:{label:"USGS earthquakes",interval:120000,kind:"live"},weather:{label:"Open-Meteo local weather",interval:300000,kind:"live"},aqi:{label:"Open-Meteo air quality",interval:300000,kind:"live"},eonet:{label:"NASA EONET natural events",interval:900000,kind:"live"},human:{label:"GDELT human-activity news",interval:900000,kind:"live"},co2:{label:"CO₂ observation series",interval:1800000,kind:"live"},fx:{label:"Frankfurter reference rates",interval:1800000,kind:"live"},wiki:{label:"Wikimedia daily knowledge",interval:21600000,kind:"live"},github:{label:"GitHub project discovery",interval:21600000,kind:"live"},archive:{label:"Wikimedia On This Day",interval:21600000,kind:"live"},countries:{label:"REST Countries directory",interval:21600000,kind:"live"},coastline:{label:"Natural Earth coastline geometry",interval:0,kind:"static"},clock:{label:"Device clock & time zones",interval:0,kind:"static"}
+};
+const feedStatus={};
+// Compact status chips sit beside each live card's source/model label.
+const inlineFeedTargets={
+ weather:['#cardWeather .livehead','#cardWind .livehead','#cardRain .livehead','#cardUV .livehead'],
+ aqi:['#cardAQI .livehead'],iss:['#cardISS .livehead'],noaa:['#cardKP .livehead'],usgs:['#cardQuake .livehead'],
+ eonet:['#cardEvent .livehead'],co2:['#cardCO2 .livehead'],fx:['#cardFX .livehead'],
+ wiki:['#wikiStatus'],countries:['#countryStatus'],github:['#dailyProjectsStatus','#repoStatus'],archive:['#dailyArchiveStatus'],
+ human:['.holo-copy .holo-legend span:nth-child(3)']
+};
+function inlineFeedState(key,now){
+ const def=feedDefinitions[key]||{kind:'live',interval:0},state=feedStatus[key];
+ if(def.kind==='static')return ['static','STATIC'];
+ if(!state)return ['checking','CHECKING'];
+ if(!state.ok)return (state.failures||0)>=2?['offline','OFFLINE']:['retrying','RETRYING'];
+ if(def.interval&&now-(state.lastSuccess||0)>def.interval*2)return ['delayed','DELAYED'];
+ return ['live','LIVE'];
+}
+function ensureInlineFeedBadges(){
+ Object.entries(inlineFeedTargets).forEach(([key,selectors])=>selectors.forEach(sel=>{
+  document.querySelectorAll(sel).forEach(target=>{
+   if(target.querySelector(`[data-inline-feed="${key}"]`))return;
+   const chip=document.createElement('span');chip.className='feed-status-pill checking inline-feed-pill';chip.dataset.inlineFeed=key;chip.textContent='CHECKING';chip.setAttribute('aria-label',`${feedDefinitions[key]?.label||key} status`);
+   if(sel==='#wikiStatus'||sel==='#countryStatus'||sel==='#dailyProjectsStatus'||sel==='#repoStatus'||sel==='#dailyArchiveStatus'){
+    chip.style.display='inline-flex';chip.style.marginRight='7px';target.prepend(chip);
+   }else target.appendChild(chip);
+  });
+ }));
+}
+function updateInlineFeedBadges(now=Date.now()){
+ ensureInlineFeedBadges();
+ document.querySelectorAll('[data-inline-feed]').forEach(chip=>{const [status,label]=inlineFeedState(chip.dataset.inlineFeed,now);chip.className=`feed-status-pill ${status} inline-feed-pill`;chip.textContent=label;});
+}
+function renderFeedStatus(){
+ const now=Date.now();
+ updateInlineFeedBadges(now);
+ let live=0,delayed=0,retrying=0,offline=0,checking=0;
+ Object.entries(feedDefinitions).forEach(([key,def])=>{
+  if(def.kind==="static")return;
+  const state=feedStatus[key];
+  if(!state){checking++;return;}
+  const age=state.lastSuccess?now-state.lastSuccess:Infinity;
+  if(!state.ok){if((state.failures||0)>=2)offline++;else retrying++;}
+  else if(def.interval&&age>def.interval*2)delayed++;
+  else live++;
+ });
+ const total=Object.values(feedDefinitions).filter(x=>x.kind!=="static").length;
+ const online=$("liveFeedsOnline"),summary=$("syncSummary");
+ if(online)online.textContent=`${live}/${total}`;
+ if(summary)summary.textContent=`${live} live · ${delayed} delayed · ${retrying} retrying · ${offline} offline · ${checking} checking`;
+}
+
+function updateEarthEnvironmentSummary(){
+ const el=$("earthEnvironmentStatus");if(!el)return;
+ const keys=[['USGS','usgs'],['NASA EONET','eonet'],['CO₂','co2'],['Air quality','aqi'],['NOAA space weather','noaa']];
+ const parts=keys.map(([label,key])=>{const st=feedStatus[key];const def=feedDefinitions[key]||{};const status=!st?'CHECKING':st.ok?(def.interval&&Date.now()-(st.lastSuccess||0)>def.interval*2?'DELAYED':'LIVE'):((st.failures||0)>=2?'OFFLINE':'RETRYING');return `${label}: ${status}`;});
+ el.textContent=`Feed health · ${parts.join(' · ')}. Values below update independently as each source responds; observation datasets can have their own reporting delays.`;
+}
+function markFeed(name,ok){
+ if(!feedDefinitions[name])feedDefinitions[name]={label:name,interval:0,kind:"live"};
+ const previous=feedStatus[name],now=Date.now();
+ const failures=ok?0:((previous?.failures||0)+1);
+ feedStatus[name]={ok:!!ok,time:now,lastSuccess:ok?now:(previous?.lastSuccess||0),failures};
+ renderFeedStatus();
+ updateEarthEnvironmentSummary();
+}
+renderFeedStatus();
+updateEarthEnvironmentSummary();
+
+function wmoInfo(code){
+  const m={0:["Clear sky","☀️"],1:["Mainly clear","🌤️"],2:["Partly cloudy","⛅"],3:["Overcast","☁️"],45:["Fog / Haze","🌫️"],48:["Rime fog","🌫️"],51:["Light drizzle","🌦️"],53:["Moderate drizzle","🌦️"],55:["Dense drizzle","🌧️"],56:["Freezing drizzle","🌧️"],57:["Heavy freezing drizzle","🌧️"],61:["Slight rain","🌦️"],63:["Moderate rain","🌧️"],65:["Heavy rain","🌧️"],66:["Freezing rain","🌧️"],67:["Heavy freezing rain","🌧️"],71:["Slight snow","❄️"],73:["Moderate snow","❄️"],75:["Heavy snow","❄️"],77:["Snow grains","❄️"],80:["Rain showers","🌦️"],81:["Moderate showers","🌧️"],82:["Violent showers","⛈️"],85:["Snow showers","🌨️"],86:["Heavy snow showers","🌨️"],95:["Thunderstorm","⛈️"],96:["Thunderstorm + hail","⛈️"],99:["Severe thunderstorm","⛈️"]};
+  return m[code]??["Conditions updated","🌦️"];
+}
+function degToCompass(deg){if(deg==null||isNaN(deg))return "—";return ["N","NE","E","SE","S","SW","W","NW"][Math.round(((deg%360)/45))%8];}
+function usAqiLabel(v){if(v==null)return "—";if(v<=50)return "Good";if(v<=100)return "Moderate";if(v<=150)return "Sensitive";if(v<=200)return "Unhealthy";if(v<=300)return "Very unhealthy";return "Hazardous";}
+function uvLabel(v){if(v==null||isNaN(v))return "—";if(v<3)return "Low";if(v<6)return "Moderate";if(v<8)return "High";if(v<11)return "Very high";return "Extreme";}
+function kpLabel(kp){if(kp<4)return "Quiet (G0)";if(kp<5)return "Unsettled";if(kp<6)return "Minor storm (G1)";if(kp<7)return "Mod. storm (G2)";if(kp<8)return "Strong storm (G3)";if(kp<9)return "Severe (G4)";return "Extreme (G5)";}
+
+const clockZones=[{name:"UTC",tz:"UTC"},{name:"New York",tz:"America/New_York"},{name:"London",tz:"Europe/London"},{name:"Tokyo",tz:"Asia/Tokyo"}];
+function updateClocks(){
+  const now=new Date(),fmtTime=tz=>now.toLocaleTimeString("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  $("clockIST").textContent=fmtTime("Asia/Kolkata")+" IST";
+  $("clockDate").textContent=now.toLocaleDateString("en-IN",{timeZone:"Asia/Kolkata",weekday:"short",day:"numeric",month:"short",year:"numeric"})+" · Faridabad";
+  $("worldClocks").innerHTML=clockZones.map(z=>`<div>${esc(z.name)}: ${fmtTime(z.tz)}</div>`).join("");
+}
+$("addClockBtn").onclick=()=>{
+  const tz=$("clockZoneSelect").value;
+  if(clockZones.some(z=>z.tz===tz)){ $("clockDate").textContent="That time zone is already on your clock list."; return; }
+  const label=$("clockZoneSelect").selectedOptions[0]?.textContent||tz;
+  clockZones.push({name:label.split(" · ")[0],tz});updateClocks();
+};
+
+async function liveWeather(){
+  const {lat,lon,name}=currentLocation;
+  $("weatherTitle").textContent=`🌦 ${name} weather`;
+  $("aqiTitle").textContent=`🌫 ${name} air quality`;
+  $("uvTitle").textContent=`☀️ ${name} UV & daylight`;
+  $("windTitle").textContent=`🌬 ${name} wind & pressure`;
+  $("rainTitle").textContent=`🌧 ${name} rain forecast`;
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code,surface_pressure,uv_index,is_day&hourly=precipitation_probability,precipitation,uv_index&daily=sunrise,sunset&forecast_days=2&timezone=auto`;
+    const d=await json(url), c=d.current, tz=d.timezone_abbreviation||"Local";
+    const curHourPrefix=c.time.slice(0,13), hrIdx=Math.max(0,d.hourly.time.findIndex(t=>t.slice(0,13)===curHourPrefix));
+    const [wxLabel,dayEmoji]=wmoInfo(c.weather_code);
+    const isDay=Number(c.is_day)===1;
+    const wxEmoji= isDay ? dayEmoji : ({0:"🌙",1:"🌙",2:"☁️",3:"☁️",45:"🌫️",48:"🌫️"}[c.weather_code]||dayEmoji);
+    const dayNight=isDay?"Daytime":"Night-time";
+
+    $("temp").textContent=`${c.temperature_2m.toFixed(1)}°C`;
+    $("wxIcon").textContent=wxEmoji;
+    $("weatherExtra").textContent=`${dayNight} · ${wxLabel} · Feels ${Math.round(c.apparent_temperature)}°C · RH ${c.relative_humidity_2m}%`;
+    $("weatherStatus").textContent=`Model time ${c.time.replace("T"," ")} (${tz})`;
+
+    const uvVal=Number(c.uv_index??d.hourly.uv_index?.[hrIdx]);
+    const sr=d.daily?.sunrise?.[0]?.slice(11,16)||"—", ss=d.daily?.sunset?.[0]?.slice(11,16)||"—";
+    $("uv").textContent=Number.isFinite(uvVal)?`${uvVal.toFixed(1)} · ${uvLabel(uvVal)}`:"—";
+    $("uvDot").style.left=Number.isFinite(uvVal)?`${Math.min(100,Math.max(2,(uvVal/12)*100))}%`:"5%";
+    $("uvExtra").textContent=`Sunrise ${sr} · Sunset ${ss} (${tz})`;
+    $("uvStatus").textContent=`Updated ${new Date().toLocaleTimeString()}`;
+
+    $("wind").textContent=`${Math.round(c.wind_speed_10m)} km/h ${degToCompass(c.wind_direction_10m)}`;
+    $("windCompass").style.transform=`rotate(${(Number(c.wind_direction_10m||0)-90)}deg)`;
+    $("windExtra").textContent=`Gusts ${Math.round(c.wind_gusts_10m)} km/h · Pressure ${Math.round(c.surface_pressure)} hPa`;
+    $("windStatus").textContent=`Updated ${new Date().toLocaleTimeString()}`;
+
+    const vals=d.hourly.time.slice(hrIdx,hrIdx+7).map((t,i)=>({
+      hhmm:t.slice(11,16),
+      rain:Number(d.hourly.precipitation[hrIdx+i]||0),
+      prob:Number(d.hourly.precipitation_probability[hrIdx+i]||0)
+    }));
+    $("rainNow").textContent=`${(vals[0]?.rain??0).toFixed(1)} mm`;
+    $("rainStatus").textContent=`Next 6 h · peak ${Math.max(0,...vals.map(v=>v.prob))}% chance`;
+    const max=Math.max(.2,...vals.map(v=>v.rain));
+    $("rainBars").innerHTML=vals.map((v,i)=>`<i title="${v.hhmm}: ${v.rain.toFixed(1)} mm (${v.prob}% chance)" style="height:${Math.max(7,(v.rain/max)*90)}%;animation-delay:${i*60}ms"></i>`).join("");
+    if(vals.length>=7)$("rainLabels").innerHTML=`<span>${vals[0].hhmm}</span><span>${vals[3].hhmm}</span><span>${vals[6].hhmm}</span>`;
+
+    ["cardWeather","cardUV","cardWind","cardRain"].forEach(pulseCard);
+    markFeed("weather",true);
+  }catch(e){
+    $("weatherStatus").textContent="No Open-Meteo response — no substitute values are shown. Retry when connected.";
+    $("uvStatus").textContent="Unavailable";$("windStatus").textContent="Unavailable";$("rainStatus").textContent="Unavailable";
+    markFeed("weather",false);
+  }
+}
+
+async function liveAQI(){
+  const {lat,lon}=currentLocation;
+  try{
+    const d=await json(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,european_aqi,pm2_5,pm10,nitrogen_dioxide&timezone=auto`);
+    const c=d.current;
+    $("aqi").textContent=c.us_aqi!=null?`${c.us_aqi} · ${usAqiLabel(c.us_aqi)}`:`${c.european_aqi??"—"} EU`;
+    const aqiPos=c.us_aqi!=null?Math.min(100,Math.max(2,(c.us_aqi/300)*100)):15;
+    $("aqiDot").style.left=`${aqiPos}%`;
+    $("aqiExtra").textContent=`EAQI ${c.european_aqi??"—"} · PM2.5 ${c.pm2_5??"—"} · PM10 ${c.pm10??"—"} µg/m³`;
+    $("aqiStatus").textContent=`NO₂ ${c.nitrogen_dioxide??"—"} µg/m³ · ${c.time.replace("T"," ")}`;
+    if($("earthAQIMetric"))$("earthAQIMetric").textContent=c.us_aqi!=null?`${c.us_aqi} · ${usAqiLabel(c.us_aqi)}`:`${c.european_aqi??"—"} EU`;
+    pulseCard("cardAQI");
+    markFeed("aqi",true);
+  }catch(e){
+    $("aqiStatus").textContent="Air-quality model unavailable";
+    if($("earthAQIMetric"))$("earthAQIMetric").textContent="Unavailable";
+    markFeed("aqi",false);
+  }
+}
+
+async function liveISS(){
+  try{
+    const d=await json("https://api.wheretheiss.at/v1/satellites/25544");
+    const alt=`${d.altitude.toFixed(1)} km`, vel=fmt(Math.round(d.velocity)), vis=d.visibility==="daylight"?"☀️ Sunlight":"🌑 Shadow";
+    const coords=`${d.latitude.toFixed(2)}°, ${d.longitude.toFixed(2)}°`;
+    $("issAlt").textContent=alt;
+    $("issCoords").textContent=`${coords} · ${vel} km/h · ${vis}`;
+    $("issStatus").textContent=`Telemetry ${new Date(d.timestamp*1000).toLocaleTimeString()}`;
+    $("issAlt2").textContent=`${alt} · ${vel} km/h`;
+    $("issCoord2").textContent=`Coordinates: ${coords} · ${vis} · Footprint ${Math.round(d.footprint)} km`;
+    if($("issUpdated"))$("issUpdated").textContent=`Source timestamp: ${new Date(d.timestamp*1000).toLocaleString()} · checked ${new Date().toLocaleTimeString()}`;
+    $("issMap").href=`https://www.google.com/maps?q=${d.latitude},${d.longitude}`;
+    pulseCard("cardISS");
+    markFeed("iss",true);
+  }catch(e){$("issStatus").textContent="ISS telemetry temporarily unavailable";markFeed("iss",false);}
+}
+
+async function liveSpaceWeather(){
+  const pick=(obj,keys)=>{
+    if(!obj||typeof obj!="object")return null;
+    const map=Object.fromEntries(Object.entries(obj).map(([k,v])=>[k.toLowerCase().replace(/[^a-z0-9]/g,""),v]));
+    for(const key of keys){const v=map[key.toLowerCase().replace(/[^a-z0-9]/g,"")];if(v!==undefined&&v!==null&&v!=="")return v;}
+    return null;
+  };
+  const rows=value=>Array.isArray(value)?value.filter(v=>v&&typeof v==="object"):value&&typeof value==="object"?[value]:[];
+  const latestWith=(value,keys)=>rows(value).slice().reverse().find(row=>pick(row,keys)!=null)||null;
+  const numeric=(obj,keys)=>{const v=pick(obj,keys);if(v===null)return null;const n=Number(v);return Number.isFinite(n)?n:null;};
+  try{
+    // Prefer NOAA's current summary products; use the rolling RTSW products as a fallback.
+    const [kpRes,windRes,magRes,xrayRes,windAltRes,magAltRes]=await Promise.allSettled([
+      json("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"),
+      json("https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json"),
+      json("https://services.swpc.noaa.gov/products/summary/solar-wind-mag-field.json"),
+      json("https://services.swpc.noaa.gov/json/goes/primary/xrays-7-day.json"),
+      json("https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json"),
+      json("https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json")
+    ]);
+    let kpText="—",windTxt="—",bzTxt="—",stamp="",kpValNum=0,xrayTxt="—",xrayStamp="",windStamp="",magStamp="";
+    if(kpRes.status==="fulfilled"){
+      const row=latestWith(kpRes.value,["kp_index","estimated_kp","kp"]);
+      const kp=numeric(row,["kp_index","estimated_kp","kp"]);
+      if(kp!==null){kpValNum=kp;kpText=`Kp ${kp.toFixed(2)}`;$("kpVal").textContent=`${kp.toFixed(2)} · ${kpLabel(kp)}`;stamp=pick(row,["time_tag","time","timestamp"])||"";}
+    }
+    let wrow=windRes.status==="fulfilled"?latestWith(windRes.value,["WindSpeed","wind_speed","speed","proton_speed"]):null;
+    let ws=numeric(wrow,["WindSpeed","wind_speed","speed","proton_speed"]);
+    if(ws===null&&windAltRes.status==="fulfilled"){wrow=latestWith(windAltRes.value,["speed","wind_speed","proton_speed"]);ws=numeric(wrow,["speed","wind_speed","proton_speed"]);}
+    if(ws!==null){windTxt=`${ws.toFixed(0)} km/s`;windStamp=pick(wrow,["time_tag","observation_time","time"])||"";}
+    let mrow=magRes.status==="fulfilled"?latestWith(magRes.value,["Bz","bz","bz_gsm","BzGSM"]):null;
+    let bz=numeric(mrow,["Bz","bz","bz_gsm","BzGSM"]),bt=numeric(mrow,["Bt","bt","bt_gsm"]);
+    if(bz===null&&magAltRes.status==="fulfilled"){mrow=latestWith(magAltRes.value,["bz_gsm","bz","Bz"]);bz=numeric(mrow,["bz_gsm","bz","Bz"]);bt=numeric(mrow,["bt","bt_gsm","Bt"]);}
+    if(bz!==null){bzTxt=`Bz ${bz.toFixed(1)} nT${bt===null?"":` (Bt ${bt.toFixed(1)} nT)`}`;magStamp=pick(mrow,["time_tag","observation_time","time"])||"";}
+    if(xrayRes.status==="fulfilled"){
+      const xr=rows(xrayRes.value).filter(v=>String(pick(v,["energy"])||"").replace(/\s/g,"")==="0.1-0.8nm");
+      const latest=xr.slice(-1)[0],flux=numeric(latest,["flux"]);
+      if(flux!==null&&flux>0){const band=[[1e-4,"X"],[1e-5,"M"],[1e-6,"C"],[1e-7,"B"],[0,"A"]].find(([t])=>flux>=t)||[0,"A"];xrayTxt=`${band[1]}${(flux/(band[0]||1e-8)).toFixed(2)}`;xrayStamp=pick(latest,["time_tag","time"])||"";}
+    }
+    const hasAny=[kpText!=="—",windTxt!=="—",bzTxt!=="—",xrayTxt!=="—"].some(Boolean);
+    $("kpExtra").textContent=`Solar wind ${windTxt} · ${bzTxt}`;
+    $("kpStatus").textContent=hasAny?`NOAA SWPC observations checked ${new Date().toLocaleTimeString()}`:"NOAA SWPC observations unavailable";
+    $("spaceWeatherTab").textContent=`${kpText} · Wind ${windTxt}`;
+    $("spaceWeatherDetail").textContent=hasAny?`Interplanetary Magnetic Field: ${bzTxt}. GOES X-ray flare band: ${xrayTxt}. Near-real-time observations; instrument and processing delays may apply.`:"NOAA did not return usable space-weather observations. Check the source links or try again when connected.";
+    $("solarWindMetric").textContent=windTxt;$("imfMetric").textContent=bzTxt;$("xrayMetric").textContent=xrayTxt;$("kpMetric").textContent=kpText.replace("Kp ","");
+    $("spaceWeatherUpdated").textContent=`Checked ${new Date().toLocaleString()}${stamp?` · Kp ${stamp} UTC`:""}${windStamp?` · Wind ${windStamp} UTC`:""}${magStamp?` · IMF ${magStamp} UTC`:""}${xrayStamp?` · GOES ${xrayStamp} UTC`:""}`;
+    const activeSegs=Math.max(1,Math.min(9,Math.round(kpValNum)));
+    [...$("kpBars").children].forEach((bar,idx)=>{const lit=idx<activeSegs,col=idx<4?"#8ce0b5":idx<6?"#ffcf70":"#ff8b8b";bar.style.background=lit&&kpText!=="—"?col:"#ffffff14";bar.style.boxShadow=lit&&kpText!=="—"?`0 0 8px ${col}88`:"none";});
+    if(hasAny)pulseCard("cardKP");
+    markFeed("noaa",hasAny);
+  }catch(e){
+    $("kpStatus").textContent="NOAA SWPC unavailable";$("kpExtra").textContent="Solar wind and magnetic-field observations unavailable.";
+    $("spaceWeatherTab").textContent="Space-weather data unavailable";$("spaceWeatherDetail").textContent="NOAA did not return usable observations. Try again later; no substitute values are shown.";
+    ["solarWindMetric","imfMetric","xrayMetric","kpMetric"].forEach(id=>$(id).textContent="Unavailable");
+    $("spaceWeatherUpdated").textContent=`Last checked ${new Date().toLocaleString()}`;markFeed("noaa",false);
+  }
+}
+
+
+/* Interactive Earth hologram: plotted only from coordinates returned by public feeds. */
+const earthMapState={events:[],rotation:0,hits:[],selected:null,lastUpdated:null,frame:0};
+// NASA Blue Marble: real satellite-derived global imagery (public educational imagery).
+const earthTexture=new Image();earthTexture.src="https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/july/world.200407.3x5400x2700.jpg";
+let earthCoastlines=[];
+const earthLand=[
+ [[-168,70],[-145,72],[-130,58],[-124,48],[-117,32],[-105,23],[-97,18],[-83,9],[-78,20],[-83,28],[-80,39],[-68,47],[-60,55],[-80,63],[-100,72],[-130,72]],
+ [[-81,12],[-70,9],[-58,-5],[-50,-15],[-53,-30],[-66,-55],[-75,-42],[-79,-20]],
+ [[-10,72],[25,70],[42,58],[55,50],[45,38],[35,30],[30,10],[18,-5],[5,5],[-5,25],[-17,35],[-10,50]],
+ [[35,70],[65,72],[100,62],[130,55],[150,48],[165,60],[178,52],[160,40],[145,32],[125,20],[110,5],[100,10],[85,8],[75,20],[60,25],[48,38],[40,52]],
+ [[112,-11],[133,-12],[153,-25],[145,-39],[125,-43],[114,-29]],
+ [[-24,65],[-13,64],[-15,72],[-23,70]],[[47,-13],[51,-17],[49,-25],[45,-22]],[[130,32],[142,35],[145,43],[137,45]],
+ [[-8,50],[2,50],[1,58],[-6,58]],[[95,5],[120,5],[128,-5],[115,-8],[105,-3]]
+];
+function earthProject(lon,lat,cx,cy,r){
+ // Match the equirectangular NASA Blue Marble texture crop: longitude and latitude map directly to the image.
+ const L=(lon*Math.PI/180)-earthMapState.rotation, P=lat*Math.PI/180;
+ const z=Math.cos(P)*Math.cos(L);
+ return {x:cx+r*(L/(Math.PI/2)),y:cy-r*(P/(Math.PI/2)),z};
+}
+let earthRaf=0,earthRunning=false,earthLastFrame=0,earthVisible=true;
+function startEarthAnimation(){if(earthRunning||document.hidden||!earthVisible)return;earthRunning=true;earthLastFrame=0;earthRaf=requestAnimationFrame(drawEarthHologram);}
+function stopEarthAnimation(){earthRunning=false;if(earthRaf)cancelAnimationFrame(earthRaf);earthRaf=0;}
+function drawEarthHologram(now=0){
+ if(!earthRunning||document.hidden||!earthVisible)return;
+ if(now-earthLastFrame<50){earthRaf=requestAnimationFrame(drawEarthHologram);return;}
+ earthLastFrame=now;
+ const c=$("eventEarthCanvas");if(!c)return;const ctx=c.getContext("2d"),W=c.width,H=c.height,cx=W/2,cy=H/2,r=190;
+ ctx.clearRect(0,0,W,H);
+ const aura=ctx.createRadialGradient(cx,cy,90,cx,cy,250);aura.addColorStop(0,"#183e5b00");aura.addColorStop(.72,"#55e5df10");aura.addColorStop(1,"#65baff00");ctx.fillStyle=aura;ctx.fillRect(0,0,W,H);
+ ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+ const ocean=ctx.createRadialGradient(cx-r*.36,cy-r*.42,12,cx,cy,r*1.15);ocean.addColorStop(0,"#17466a");ocean.addColorStop(.58,"#0c2947");ocean.addColorStop(1,"#061321");ctx.fillStyle=ocean;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+ // Use an actual NASA Blue Marble satellite map as the globe surface, not drawn continent shapes.
+ if(earthTexture.complete&&earthTexture.naturalWidth){
+   const sw=earthTexture.naturalWidth/2,sh=earthTexture.naturalHeight;
+   let sx=((earthMapState.rotation/(Math.PI*2)+.25)*earthTexture.naturalWidth)%earthTexture.naturalWidth;if(sx<0)sx+=earthTexture.naturalWidth;
+   const first=Math.min(sw,earthTexture.naturalWidth-sx),destW=2*r*(first/sw);
+   ctx.drawImage(earthTexture,sx,0,first,sh,cx-r,cy-r,destW,2*r);
+   if(first<sw)ctx.drawImage(earthTexture,0,0,sw-first,sh,cx-r+destW,cy-r,2*r-destW,2*r);
+   ctx.fillStyle="rgba(3,13,29,.14)";ctx.fillRect(cx-r,cy-r,r*2,r*2);
+   const sphereShade=ctx.createRadialGradient(cx-r*.34,cy-r*.38,r*.12,cx,cy,r*1.04);
+   sphereShade.addColorStop(0,"rgba(0,0,0,0)");sphereShade.addColorStop(.68,"rgba(0,7,18,.08)");sphereShade.addColorStop(1,"rgba(0,5,16,.72)");
+   ctx.fillStyle=sphereShade;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+ }else{
+   ctx.strokeStyle="rgba(111,227,215,.28)";ctx.lineWidth=1.1;
+   for(let lat=-60;lat<=60;lat+=30){ctx.beginPath();for(let lon=-90;lon<=90;lon+=3){const q=earthProject(lon,lat,cx,cy,r);if(lon===-90)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y)}ctx.stroke()}
+   earthLand.forEach(poly=>{ctx.beginPath();poly.forEach(([lon,lat],i)=>{const q=earthProject(lon,lat,cx,cy,r);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)});ctx.closePath();ctx.fillStyle="rgba(101,218,198,.23)";ctx.fill();ctx.strokeStyle="rgba(111,227,215,.52)";ctx.stroke()});
+ }
+ // Accurate Natural Earth coastline geometry is overlaid on the satellite surface.
+ if(earthCoastlines.length){
+  ctx.save();ctx.strokeStyle="rgba(119,245,235,.82)";ctx.lineWidth=1.25;ctx.shadowColor="#48d9df";ctx.shadowBlur=4;
+  earthCoastlines.forEach(ring=>{let drawing=false;ctx.beginPath();for(const pt of ring){const q=earthProject(pt[0],pt[1],cx,cy,r);if(q.z>.015){if(!drawing){ctx.moveTo(q.x,q.y);drawing=true}else ctx.lineTo(q.x,q.y)}else drawing=false;}ctx.stroke();});ctx.restore();
+ }
+ // Holographic latitude/longitude guides sit over the real satellite texture.
+ ctx.strokeStyle="rgba(111,227,215,.23)";ctx.lineWidth=1;
+ for(let lat=-60;lat<=60;lat+=30){ctx.beginPath();for(let lon=-90;lon<=90;lon+=3){const q=earthProject(lon,lat,cx,cy,r);if(lon===-90)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y)}ctx.stroke()}
+ for(let lon=-150;lon<=180;lon+=30){ctx.beginPath();for(let lat=-89;lat<=89;lat+=3){const q=earthProject(lon,lat,cx,cy,r);if(lat===-89)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y)}ctx.stroke()}
+ earthMapState.hits=[];
+ earthMapState.events.forEach((ev,i)=>{const q=earthProject(ev.lon,ev.lat,cx,cy,r);if(q.z<=.04)return;
+ // New feed points fade in; replaced/expired points fade out before removal.
+ const fade=ev._alpha??1,rad=(ev.type==="quake"?4.8:4.2);
+ ctx.save();ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rad+4.8,0,Math.PI*2);ctx.fillStyle=ev.color+"24";ctx.fill();ctx.beginPath();ctx.arc(q.x,q.y,rad,0,Math.PI*2);ctx.fillStyle=ev.color;ctx.shadowColor=ev.color;ctx.shadowBlur=11;ctx.fill();ctx.restore();
+ if((ev._alpha??1)>.28&&!ev._exiting)earthMapState.hits.push({x:q.x,y:q.y,r:Math.max(52,rad+15),event:ev});
+ });
+ // Fade newly received points in and expired points out; remove only after the exit animation.
+ earthMapState.events.forEach(ev=>{if(ev._exiting)ev._alpha=Math.max(0,(ev._alpha??1)-.035);else ev._alpha=Math.min(1,(ev._alpha??1)+.035);});
+ earthMapState.events=earthMapState.events.filter(ev=>!ev._exiting||ev._alpha>0);
+ ctx.restore();
+ ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle="rgba(135,235,255,.85)";ctx.lineWidth=2.4;ctx.shadowColor="#55e6e8";ctx.shadowBlur=22;ctx.stroke();ctx.shadowBlur=0;
+ ctx.beginPath();ctx.ellipse(cx,cy,r+11,r*.36,-.22,0,Math.PI*2);ctx.strokeStyle="rgba(145,186,255,.42)";ctx.lineWidth=1.3;ctx.stroke();
+ ctx.beginPath();ctx.ellipse(cx,cy,r+17,r*.26,.38,0,Math.PI*2);ctx.strokeStyle="rgba(111,227,215,.26)";ctx.lineWidth=1;ctx.stroke();
+ if(!earthMapState.selected&&!window.matchMedia("(prefers-reduced-motion: reduce)").matches)earthMapState.rotation+=.0018;
+ earthMapState.frame=earthRaf=requestAnimationFrame(drawEarthHologram);
+}
+function eventSafeLink(url){try{const u=new URL(url,location.href);return u.protocol==="https:"?u.href:"#"}catch{return "#"}}
+function setHoloEvent(ev,point){
+ earthMapState.selected=ev;const box=$("holoEventDetail"),canvas=$("eventEarthCanvas");if(!box||!canvas)return;
+ const when=ev.date?new Date(ev.date).toLocaleString():"Latest feed record";
+ $("holoDetailTitle").textContent=ev.title;
+ $("holoDetailText").textContent=`${ev.kind} · ${ev.place||`${ev.lat.toFixed(2)}°, ${ev.lon.toFixed(2)}°`} · ${when}. ${ev.description||""}`;
+ const link=$("holoDetailLink"),safe=eventSafeLink(ev.url);link.href=safe;link.textContent=`${ev.linkLabel||"Open source details"} ↗`;link.style.display=safe==="#"?"none":"inline-block";
+ const cr=canvas.getBoundingClientRect(),vr=canvas.parentElement.getBoundingClientRect();
+ const px=point?point.x*cr.width/canvas.width:cr.width*.5,py=point?point.y*cr.height/canvas.height:cr.height*.5;
+ const width=Math.min(220,window.innerWidth-56),left=Math.max(8,Math.min(vr.width-width-8,cr.left-vr.left+px+15));
+ const top=Math.max(8,Math.min(vr.height-110,cr.top-vr.top+py-34));
+ box.style.left=`${left}px`;box.style.top=`${top}px`;box.classList.add("open");
+}
+function closeHoloEvent(){earthMapState.selected=null;const box=$("holoEventDetail");if(box)box.classList.remove("open");}
+
+function updateHoloFeed(kind,events){
+ // Reconcile by stable event ID: unchanged points stay put, new ones fade in,
+ // and points no longer present in this feed fade away instead of vanishing abruptly.
+ const incoming=new Map(events.map(e=>[e.id,e]));
+ earthMapState.events.forEach(old=>{if(old.feed!==kind)return;const fresh=incoming.get(old.id);if(fresh){Object.assign(old,fresh);old._exiting=false;old._alpha=Math.max(old._alpha??1,.45);incoming.delete(old.id);}else old._exiting=true;});
+ incoming.forEach(ev=>{ev._alpha=0;ev._exiting=false;earthMapState.events.push(ev);});
+ // Keep the globe light on mobile; trim only fully faded records first.
+ earthMapState.events=earthMapState.events.filter(e=>!e._exiting||e._alpha>0).slice(-180);
+ earthMapState.lastUpdated=new Date();
+ const count=earthMapState.events.filter(e=>!e._exiting).length;if($("holoEventCount"))$("holoEventCount").textContent=`${count} mapped event ${count===1?"point":"points"}`;
+ if($("holoUpdated"))$("holoUpdated").textContent=`Feed refreshed ${earthMapState.lastUpdated.toLocaleTimeString()}`;
+ if(earthMapState.selected&&earthMapState.events.some(e=>e.id===earthMapState.selected.id&&e._exiting))closeHoloEvent();
+}
+function mapColorForCategory(text){const t=String(text||"").toLowerCase();if(/wildfire|fire|volcan|eruption|heat/.test(t))return "#ffb45e";if(/storm|flood|hurricane|cyclone|typhoon|water|ice|snow/.test(t))return "#69d9ef";return "#ffc16d"}
+function coordsFromEonet(ev){const g=ev.geometry?.[0];if(!g?.coordinates)return null;let c=g.coordinates;if(g.type==="Point")return {lon:Number(c[0]),lat:Number(c[1])};let pts=[];function walk(v){if(Array.isArray(v)&&v.length>=2&&typeof v[0]==="number"&&typeof v[1]==="number")pts.push(v);else if(Array.isArray(v))v.forEach(walk)}walk(c);if(!pts.length)return null;return {lon:pts.reduce((a,v)=>a+v[0],0)/pts.length,lat:pts.reduce((a,v)=>a+v[1],0)/pts.length}}
+async function liveHumanReports(){
+ try{
+  const query='(protest OR strike OR explosion OR "industrial accident" OR "transport accident" OR inauguration OR summit OR election)';
+  const u='https://api.gdeltproject.org/api/v2/geo/geo?'+new URLSearchParams({query,mode:'PointData',format:'GeoJSON',timespan:'24h',maxpoints:'35'});
+  const d=await json(u,14000),features=Array.isArray(d.features)?d.features:[];
+  const events=features.slice(0,35).map((f,i)=>{const c=f.geometry?.coordinates,p=f.properties||{};if(!Array.isArray(c)||c.length<2)return null;const lon=Number(c[0]),lat=Number(c[1]);if(!Number.isFinite(lon)||!Number.isFinite(lat)||Math.abs(lat)>90||Math.abs(lon)>180)return null;
+   const title=String(p.name||p.title||p.location||p.label||"Human activity reported in news").slice(0,180),raw=p.url||p.link||p.source_url;
+   const fallback='https://api.gdeltproject.org/api/v2/doc/doc?'+new URLSearchParams({query:'"'+title.replaceAll('"','')+'"',mode:'artlist',format:'html',timespan:'24h',maxrecords:'10'});
+   return {id:'human-'+i+'-'+title,feed:'human',type:'human',color:'#bba5ff',lon,lat,title,kind:'Human-made news report',place:p.location||p.name||`${lat.toFixed(2)}°, ${lon.toFixed(2)}°`,description:'A mapped location in recent global news coverage. GDELT geolocates places mentioned in reporting; this point is not an independently verified incident record.',date:p.date||p.datetime||null,url:eventSafeLink(raw||fallback),linkLabel:raw?'Open reported source':'View related reporting on GDELT'};
+  }).filter(Boolean);
+  updateHoloFeed('human',events);markFeed('human',true);
+ }catch(e){markFeed('human',false);if($("holoUpdated"))$("holoUpdated").textContent="Human-made news map temporarily unavailable; natural feeds remain separate.";}
+}
+async function loadRealEarthOutlines(){
+ try{
+  const d=await json("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_coastline.geojson",18000);
+  earthCoastlines=(d.features||[]).flatMap(f=>{const g=f.geometry;if(!g)return [];if(g.type==="LineString")return [g.coordinates];if(g.type==="MultiLineString")return g.coordinates;return [];}).filter(r=>Array.isArray(r)&&r.length>1);markFeed("coastline",true);
+ }catch(e){markFeed("coastline",false);if($("holoUpdated"))$("holoUpdated").textContent="Live feeds active · detailed coastline overlay unavailable";}
+}
+loadRealEarthOutlines();
+(function initEarthHologram(){
+ const canvas=$("eventEarthCanvas");if(!canvas)return;
+ const selectAt=(clientX,clientY)=>{
+  const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;
+  const x=(clientX-rect.left)*(canvas.width/rect.width),y=(clientY-rect.top)*(canvas.height/rect.height);
+  let best=null,dist=Infinity;
+  // Use the most recent hit positions and a generous touch target for small screens.
+  earthMapState.hits.forEach(h=>{const d=Math.hypot(x-h.x,y-h.y);if(d<=h.r&&d<dist){best=h;dist=d;}});
+  if(best)setHoloEvent(best.event,{x:best.x,y:best.y});
+ };
+ canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();selectAt(e.clientX,e.clientY);},{passive:false});
+ canvas.addEventListener('click',e=>{selectAt(e.clientX,e.clientY);});
+ canvas.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(earthMapState.hits[0])setHoloEvent(earthMapState.hits[0].event,{x:earthMapState.hits[0].x,y:earthMapState.hits[0].y})}});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&earthMapState.selected)closeHoloEvent()});
+ const earthVisibility=new IntersectionObserver(entries=>{earthVisible=entries.some(entry=>entry.isIntersecting);if(earthVisible)startEarthAnimation();else stopEarthAnimation();},{threshold:0.01});
+ earthVisibility.observe(canvas);
+ document.addEventListener('visibilitychange',()=>document.hidden?stopEarthAnimation():startEarthAnimation());
+ startEarthAnimation();
+})();
+
+async function liveQuakes(){
+  try{
+    const d=await json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"),a=d.features||[];
+    $("quakeCount").textContent=a.length;$("quakeTotal").textContent=a.length;
+    if(a.length){
+      const maxQ=a.reduce((best,cur)=>(cur.properties?.mag||0)>(best.properties?.mag||0)?cur:best,a[0]);
+      $("quakeExtra").textContent=`Strongest: M${Number(maxQ.properties.mag).toFixed(1)} · ${maxQ.properties.place}`;
+    }else{$("quakeExtra").textContent="No M2.5+ earthquakes in past 24 hours";}
+    const gen=d.metadata?.generated?new Date(d.metadata.generated).toLocaleTimeString():new Date().toLocaleTimeString();
+    updateHoloFeed("quake",a.map((f,i)=>{const p=f.properties||{},c=f.geometry?.coordinates||[];return {id:`quake-${f.id||i}`,feed:"quake",type:"quake",color:"#ff777f",lon:Number(c[0]),lat:Number(c[1]),title:`Earthquake · M${Number(p.mag||0).toFixed(1)}`,kind:"Natural event · earthquake",place:p.place||"Reported location",description:"USGS seismic event record. Magnitude and location are based on the agency's current feed.",date:p.time?new Date(p.time).toISOString():null,url:p.url||"https://earthquake.usgs.gov/earthquakes/feed/",linkLabel:"Open USGS event details"}}).filter(e=>Number.isFinite(e.lon)&&Number.isFinite(e.lat)));
+    $("quakeStatus").textContent=`USGS M2.5+ · Feed time ${gen}`;
+    $("quakeStatus2").textContent=`${a.length} events in the USGS M2.5+ past-day feed · updated ${new Date().toLocaleString()}`;
+    $("quakeRows").innerHTML=a.slice(0,25).map(f=>{
+      const p=f.properties,c=f.geometry.coordinates;
+      return `<tr><td><strong>M${esc(Number(p.mag).toFixed(1))}</strong></td><td>${esc(p.place)}</td><td>${new Date(p.time).toLocaleString("en-GB",{timeZone:"UTC"})} UTC</td><td>${esc(Number(c[2]).toFixed(1))} km</td><td><a href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener noreferrer">USGS ↗</a></td></tr>`;
+    }).join("")||'<tr><td colspan="5">No events in this feed.</td></tr>';
+    if($("earthQuakeMetric"))$("earthQuakeMetric").textContent=String(a.length);
+    pulseCard("cardQuake");
+    markFeed("usgs",true);
+  }catch(e){$("quakeStatus").textContent="USGS feed unavailable";$("quakeStatus2").textContent="USGS feed unavailable — refresh later";if($("earthQuakeMetric"))$("earthQuakeMetric").textContent="Unavailable";$("quakeRows").innerHTML='<tr><td colspan="5">Could not load feed.</td></tr>';markFeed("usgs",false);}
+}
+
+async function liveEvents(){
+  try{
+    const d=await json("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=30"),events=d.events||[];
+    $("eventCount").textContent=events.length;
+    if($("earthEventMetric"))$("earthEventMetric").textContent=String(events.length);
+    updateHoloFeed("eonet",events.map((ev,i)=>{const c=coordsFromEonet(ev),cat=(ev.categories||[]).map(x=>x.title).join(", ")||"Natural event";if(!c)return null;return {id:`eonet-${ev.id||i}`,feed:"eonet",type:"natural",color:mapColorForCategory(cat),lon:c.lon,lat:c.lat,title:ev.title||"Open natural event",kind:`Natural event · ${cat}`,place:ev.geometry?.[0]?.description||`${c.lat.toFixed(2)}°, ${c.lon.toFixed(2)}°`,description:"NASA EONET curated open-event catalogue. Coverage is not exhaustive and this is not an emergency alert service.",date:ev.geometry?.[0]?.date||null,url:ev.link||"https://eonet.gsfc.nasa.gov/",linkLabel:"Open NASA EONET event record"}}).filter(Boolean));
+    const cats={};events.forEach(ev=>(ev.categories||[]).forEach(c=>{cats[c.title]=(cats[c.title]||0)+1}));
+    const topCats=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${v} ${k}`).join(" · ");
+    $("eventExtra").textContent=topCats||"Open events tracked (past 30 days)";
+    $("eventStatus").textContent=`NASA EONET · checked ${new Date().toLocaleTimeString()} · ${events.length} open records`;
+    $("eventList").innerHTML=events.slice(0,8).map(ev=>{
+      const dt=ev.geometry?.[0]?.date?new Date(ev.geometry[0].date).toLocaleDateString("en-GB"):"Recent";
+      return `<div class="event-item"><div class="emoji">🌐</div><div><b><a href="${esc(safeUrl(ev.link))}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${esc(ev.title)} ↗</a></b><p>${esc((ev.categories||[]).map(x=>x.title).join(", ")||"Natural event")} · ${esc(dt)}</p></div></div>`;
+    }).join("")||'<p class="detail">No open events returned by the feed.</p>';
+    pulseCard("cardEvent");
+    markFeed("eonet",true);
+  }catch(e){$("eventStatus").textContent="NASA event feed unavailable";if($("earthEventMetric"))$("earthEventMetric").textContent="Unavailable";markFeed("eonet",false);}
+}
+
+async function liveCO2(){
+  try{
+    let ppm=NaN,trend=NaN,dateLabel="",source="";
+    // Primary community API; accept only finite numeric observations.
+    try{
+      const d=await json("https://global-warming.org/api/co2-api"),arr=d.co2||[];
+      const valid=arr.filter(x=>Number.isFinite(Number(x.cycle))||Number.isFinite(Number(x.trend)));
+      if(!valid.length)throw Error("No usable CO₂ observations");
+      const last=valid[valid.length-1];
+      ppm=Number(last.cycle??last.trend);trend=Number(last.trend);
+      dateLabel=`${last.year}-${String(last.month).padStart(2,"0")}-${String(last.day||"01").padStart(2,"0")}`;
+      source="Global Warming API";
+    }catch(primaryError){
+      // NOAA GML official monthly Mauna Loa series. Rows: year month decimal-date mean trend ...
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);
+      try{
+        const response=await fetch("https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_mlo.txt",{cache:"no-store",signal:ctrl.signal});
+        if(!response.ok)throw Error("NOAA HTTP "+response.status);
+        const raw=await response.text();
+        const rows=raw.split(/\r?\n/).map(line=>line.trim()).filter(line=>line&&!line.startsWith("#")).map(line=>line.split(/\s+/).map(Number)).filter(a=>a.length>=5&&Number.isFinite(a[0])&&Number.isFinite(a[1])&&Number.isFinite(a[3])&&a[3]>0);
+        if(!rows.length)throw Error("NOAA returned no valid monthly rows");
+        const last=rows[rows.length-1];ppm=last[3];trend=last[4];
+        dateLabel=`${last[0]}-${String(last[1]).padStart(2,"0")}`;
+        source="NOAA Global Monitoring Laboratory · Mauna Loa monthly mean";
+      }finally{clearTimeout(timer)}
+    }
+    if(!Number.isFinite(ppm)||ppm<=0)throw Error("Invalid CO₂ value");
+    const pct=((ppm-278.3)/278.3*100).toFixed(0);
+    $("co2Val").textContent=`${ppm.toFixed(2)} ppm`;
+    $("co2Extra").textContent=`${Number.isFinite(trend)?`Seasonally adjusted trend ${trend.toFixed(2)} ppm · `:""}+${pct}% vs pre-industrial reference (278.3 ppm)`;
+    $("co2Status").textContent=`Observation: ${dateLabel} · Source: ${source}`;
+    if($("earthCO2Metric"))$("earthCO2Metric").textContent=ppm.toFixed(2);
+    pulseCard("cardCO2");markFeed("co2",true);
+  }catch(e){
+    $("co2Val").textContent="Unavailable";
+    $("co2Extra").textContent="Could not retrieve the latest observation. The feed will retry automatically.";
+    $("co2Status").textContent="CO₂ sources unavailable · NOAA GML / Global Warming API";
+    if($("earthCO2Metric"))$("earthCO2Metric").textContent="Unavailable";
+    markFeed("co2",false);
+  }
+}
+
+let fxCurrencies={};
+const currencySymbols={USD:"$",INR:"₹",EUR:"€",GBP:"£",JPY:"¥",CNY:"¥",CAD:"C$",AUD:"A$",CHF:"CHF ",NZD:"NZ$",SGD:"S$",HKD:"HK$",KRW:"₩",AED:"د.إ ",SAR:"﷼",THB:"฿",BRL:"R$",ZAR:"R",MXN:"Mex$",TRY:"₺",RUB:"₽",IDR:"Rp ",MYR:"RM ",BDT:"৳",PKR:"₨",NPR:"रु "};
+async function convertFX(){
+  const amount=Number($("fxAmount").value||0),base=$("fxBase").value,target=$("fxTarget").value;
+  if(!Number.isFinite(amount)||amount<0){$("fxResult").textContent="Enter a valid amount.";return;}
+  if(base===target){$("fxResult").textContent=`${amount.toLocaleString()} ${base} = ${amount.toLocaleString()} ${target}`;return;}
+  $("fxResult").textContent="Getting the latest available reference rate…";
+  try{
+    const d=await json(`https://api.frankfurter.dev/v1/latest?base=${encodeURIComponent(base)}&symbols=${encodeURIComponent(target)}`),rate=Number(d.rates?.[target]);
+    if(!Number.isFinite(rate))throw Error("No rate");
+    $("fxResult").textContent=`${amount.toLocaleString()} ${base} = ${(amount*rate).toLocaleString(undefined,{maximumFractionDigits:4})} ${target} · ${d.date}`;
+    $("fxStatus").textContent=`Reference rate date: ${d.date} · Frankfurter / central-bank data`;
+  }catch(e){$("fxResult").textContent="This currency pair is unavailable right now. Try another pair.";}
+}
+$("fxConvertBtn").onclick=convertFX;
+async function liveFX(){
+  try{
+    const d=await json("https://api.frankfurter.dev/v1/currencies");fxCurrencies=d||{};
+    const opts=Object.keys(fxCurrencies).sort().map(code=>`<option value="${esc(code)}">${esc(code)} · ${esc(fxCurrencies[code])}</option>`).join("");
+    ["fxBase","fxTarget"].forEach(id=>{const el=$(id),old=el.value;el.innerHTML=opts;if(fxCurrencies[old])el.value=old;$(id+"Label").textContent=el.selectedOptions[0]?.textContent||el.value;});
+    const rates=await json("https://api.frankfurter.dev/v1/latest?base=USD&symbols=INR,EUR,GBP,JPY,CNY,CAD,AUD,CHF,SGD"),r=rates.rates||{};
+    $("fxMain").textContent=`₹${Number(r.INR).toFixed(2)}`;
+    const syms=["EUR","GBP","JPY","CNY","CAD","AUD","CHF","SGD"];
+    $("fxGrid").innerHTML=syms.map(code=>`<div>${code}: ${currencySymbols[code]||""}${Number(r[code]).toLocaleString(undefined,{maximumFractionDigits:3})}</div>`).join("")+`<div>Base: 1 USD</div>`;
+    $("fxStatus").textContent=`Central-bank reference date: ${esc(rates.date)}`;
+    await convertFX();pulseCard("cardFX");markFeed("fx",true);
+  }catch(e){$("fxStatus").textContent="FX feed unavailable";markFeed("fx",false);}
+}
+
+
+// Full-screen NEXORA-style selectors for currencies and time zones
+let activeChoiceTarget=null;
+function openChoice(target,title,description,eyebrow){
+  activeChoiceTarget=target;
+  $("choiceTitle").textContent=title;$("choiceDescription").textContent=description;$("choiceEyebrow").textContent=eyebrow;
+  const sel=$(target),q=$("choiceSearch");q.value="";renderChoiceCards();
+  $("choicePage").classList.add("show");document.body.style.overflow="hidden";q.focus();
+}
+function renderChoiceCards(){
+  if(!activeChoiceTarget)return;const sel=$(activeChoiceTarget),q=$("choiceSearch").value.trim().toLowerCase();
+  const opts=[...sel.options].filter(o=>!o.disabled);const filtered=opts.filter(o=>(o.textContent+" "+o.value).toLowerCase().includes(q));
+  $("choiceStatus").textContent=`${filtered.length} option${filtered.length===1?"":"s"} available · Current: ${sel.selectedOptions[0]?.textContent||sel.value}`;
+  $("choiceGrid").innerHTML=filtered.map(o=>`<button class="loc-card choice-card ${o.value===sel.value?"current":""}" type="button" data-choice-value="${esc(o.value)}"><div class="loc-card-top"><span>AVAILABLE OPTION</span><span>${o.value===sel.value?"● SELECTED":"SELECT →"}</span></div><h4>${esc(o.textContent)}</h4><p>${esc(o.value)}</p></button>`).join("")||'<div class="detail">No matches. Try another search.</div>';
+}
+function closeChoice(){$("choicePage").classList.remove("show");document.body.style.overflow="";activeChoiceTarget=null;}
+$("choiceSearch").addEventListener("input",renderChoiceCards);
+$("choiceGrid").addEventListener("click",e=>{const card=e.target.closest("[data-choice-value]");if(!card||!activeChoiceTarget)return;const target=activeChoiceTarget,sel=$(target);sel.value=card.dataset.choiceValue;sel.dispatchEvent(new Event("change",{bubbles:true}));
+  if(target==="fxBase"||target==="fxTarget"){$(target+"Label").textContent=sel.selectedOptions[0]?.textContent||sel.value;convertFX();}
+  if(target==="clockZoneSelect"){$("clockZoneLabel").textContent=sel.selectedOptions[0]?.textContent||sel.value;}
+  closeChoice();});
+$("closeChoicePage").onclick=closeChoice;
+$("fxBasePick").onclick=()=>openChoice("fxBase","Choose base currency","Select the currency you want to convert from.","Exchange rate settings");
+$("fxTargetPick").onclick=()=>openChoice("fxTarget","Choose target currency","Select the currency you want to convert into.","Exchange rate settings");
+$("clockZonePick").onclick=()=>openChoice("clockZoneSelect","Choose a time zone","Search for a city or time zone, then add it to your world clock.","World clock settings");
+
+async function liveWiki(){
+  const now=new Date(),y=now.getUTCFullYear(),m=String(now.getUTCMonth()+1).padStart(2,"0"),day=String(now.getUTCDate()).padStart(2,"0");
+  const urls=[
+    `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${y}/${m}/${day}`,
+    `https://en.wikipedia.org/api/rest_v1/feed/featured/${y}/${m}/${day}`
+  ];
+  let lastError=null;
+  for(const url of urls){
+    try{
+      const d=await json(url),items=[];
+      const featured=d.tfa||d.featured_article||null;
+      if(featured){
+        const title=featured.normalizedtitle||featured.title||"Featured article";
+        const link=featured.content_urls?.desktop?.page||featured.content_urls?.mobile?.page||`https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g,"_"))}`;
+        items.push({icon:"⭐",title:`Featured today: ${title}`,desc:(featured.extract||featured.description||"Wikimedia’s featured article for today.").slice(0,220),url:link});
+      }
+      const mostRead=Array.isArray(d.mostread)?d.mostread:(d.mostread?.articles||d.most_read||[]);
+      mostRead.filter(a=>a&&a.title&&a.title!=="Main_Page"&&!String(a.title).startsWith("Special:")).slice(0,6).forEach(a=>{
+        const title=a.normalizedtitle||a.title;
+        const link=a.content_urls?.desktop?.page||a.content_urls?.mobile?.page||`https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g,"_"))}`;
+        const views=Number(a.views||a.view_count||0);
+        items.push({icon:"📈",title,desc:`${views?fmt(views)+" views":"Popular topic"} · ${a.description||"Among Wikipedia’s most-read topics."}`,url:link});
+      });
+      if(!items.length)throw Error("Wikimedia returned no featured or most-read entries");
+      const stamp=new Date().toLocaleString();
+      $("wikiStatus").textContent=`Live Wikimedia feed · ${y}-${m}-${day} UTC · checked ${stamp}. Most-read topics reflect reader interest, not scientific importance.`;
+      $("wikiHeadline").textContent=items[0].title.replace("Featured today: ","")+`. ${items.length-1} additional popular topic${items.length===2?"":"s"} are listed below.`;
+      $("wikiList").innerHTML=items.map(it=>`<div class="event-item"><div class="emoji">${it.icon}</div><div><b><a href="${esc(safeUrl(it.url))}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none">${esc(it.title)} ↗</a></b><p>${esc(it.desc)}</p></div></div>`).join("");
+      markFeed("wiki",true);return;
+    }catch(e){lastError=e;}
+  }
+  $("wikiStatus").textContent=`Wikimedia live feed unavailable · last checked ${new Date().toLocaleTimeString()}. Retrying automatically.`;
+  $("wikiHeadline").textContent="No live featured or most-read information is available right now; no replacement information is fabricated.";
+  $("wikiList").innerHTML='<p class="detail">Wikimedia did not return today’s feed. The website will try again automatically.</p>';
+  markFeed("wiki",false);
+}
+
+/* Country Directory */
+const fallback=[
+["India","New Delhi","Asia",1428627663,3287263,"Indian rupee","🇮🇳","IN","South Asia","Hindi, English"],["Japan","Tokyo","Asia",123294513,377975,"Japanese yen","🇯🇵","JP","East Asia","Japanese"],["China","Beijing","Asia",1409670000,9596961,"Renminbi","🇨🇳","CN","East Asia","Chinese"],["Singapore","Singapore","Asia",5917600,728,"Singapore dollar","🇸🇬","SG","Southeast Asia","English, Malay, Mandarin, Tamil"],["Indonesia","Jakarta","Asia",281190000,1904569,"Indonesian rupiah","🇮🇩","ID","Southeast Asia","Indonesian"],["Australia","Canberra","Oceania",27000000,7692024,"Australian dollar","🇦🇺","AU","Australia and New Zealand","English"],["New Zealand","Wellington","Oceania",5300000,268838,"New Zealand dollar","🇳🇿","NZ","Australia and New Zealand","English, Māori"],["United States","Washington, D.C.","Americas",340110988,9833517,"United States dollar","🇺🇸","US","North America","English"],["Canada","Ottawa","Americas",40097761,9984670,"Canadian dollar","🇨🇦","CA","North America","English, French"],["Brazil","Brasília","Americas",211998573,8515767,"Brazilian real","🇧🇷","BR","South America","Portuguese"],["Mexico","Mexico City","Americas",130861007,1964375,"Mexican peso","🇲🇽","MX","North America","Spanish"],["United Kingdom","London","Europe",68350000,242495,"Pound sterling","🇬🇧","GB","Northern Europe","English"],["France","Paris","Europe",68170000,551695,"Euro","🇫🇷","FR","Western Europe","French"],["Germany","Berlin","Europe",84358845,357022,"Euro","🇩🇪","DE","Western Europe","German"],["Italy","Rome","Europe",58900000,301340,"Euro","🇮🇹","IT","Southern Europe","Italian"],["Spain","Madrid","Europe",48590000,505990,"Euro","🇪🇸","ES","Southern Europe","Spanish"],["Norway","Oslo","Europe",5550203,385207,"Norwegian krone","🇳🇴","NO","Northern Europe","Norwegian"],["South Africa","Pretoria","Africa",63212384,1221037,"South African rand","🇿🇦","ZA","Southern Africa","Zulu, Xhosa, Afrikaans, English"],["Egypt","Cairo","Africa",112716598,1002450,"Egyptian pound","🇪🇬","EG","Northern Africa","Arabic"],["Kenya","Nairobi","Africa",56432944,580367,"Kenyan shilling","🇰🇪","KE","Eastern Africa","Swahili, English"],["Nigeria","Abuja","Africa",232679478,923768,"Nigerian naira","🇳🇬","NG","Western Africa","English"],["Morocco","Rabat","Africa",38081173,446550,"Moroccan dirham","🇲🇦","MA","Northern Africa","Arabic, Amazigh"],["Argentina","Buenos Aires","Americas",45851578,2780400,"Argentine peso","🇦🇷","AR","South America","Spanish"],["Chile","Santiago","Americas",19658835,756102,"Chilean peso","🇨🇱","CL","South America","Spanish"],["South Korea","Seoul","Asia",51784059,100210,"South Korean won","🇰🇷","KR","East Asia","Korean"],["Thailand","Bangkok","Asia",71668011,513120,"Thai baht","🇹🇭","TH","Southeast Asia","Thai"],["Saudi Arabia","Riyadh","Asia",33962757,2149690,"Saudi riyal","🇸🇦","SA","Western Asia","Arabic"],["Türkiye","Ankara","Asia",85326000,783562,"Turkish lira","🇹🇷","TR","Western Asia","Turkish"],["Switzerland","Bern","Europe",8962300,41285,"Swiss franc","🇨🇭","CH","Western Europe","German, French, Italian, Romansh"],["Iceland","Reykjavík","Europe",393600,103000,"Icelandic króna","🇮🇸","IS","Northern Europe","Icelandic"],
+["Afghanistan","Kabul","Asia",41128771,652230,"Afghan afghani","🇦🇫","AF","Southern Asia","Dari, Pashto"],
+["Albania","Tirana","Europe",2745972,28748,"Albanian lek","🇦🇱","AL","Southern Europe","Albanian"],
+["Algeria","Algiers","Africa",45606480,2381741,"Algerian dinar","🇩🇿","DZ","Northern Africa","Arabic, Tamazight"],
+["Angola","Luanda","Africa",36749906,1246700,"Angolan kwanza","🇦🇴","AO","Middle Africa","Portuguese"],
+["Armenia","Yerevan","Asia",2777970,29743,"Armenian dram","🇦🇲","AM","Western Asia","Armenian"],
+["Austria","Vienna","Europe",9130000,83871,"Euro","🇦🇹","AT","Central Europe","German"],
+["Azerbaijan","Baku","Asia",10153000,86600,"Azerbaijani manat","🇦🇿","AZ","Western Asia","Azerbaijani"],
+["Bahrain","Manama","Asia",1569000,786,"Bahraini dinar","🇧🇭","BH","Western Asia","Arabic"],
+["Bangladesh","Dhaka","Asia",173000000,147570,"Bangladeshi taka","🇧🇩","BD","Southern Asia","Bengali"],
+["Belgium","Brussels","Europe",11770000,30528,"Euro","🇧🇪","BE","Western Europe","Dutch, French, German"],
+["Bhutan","Thimphu","Asia",787000,38394,"Bhutanese ngultrum","🇧🇹","BT","Southern Asia","Dzongkha"],
+["Bolivia","Sucre","Americas",12388571,1098581,"Bolivian boliviano","🇧🇴","BO","South America","Spanish, Quechua, Aymara"],
+["Botswana","Gaborone","Africa",2675352,581730,"Botswana pula","🇧🇼","BW","Southern Africa","English, Setswana"],
+["Bulgaria","Sofia","Europe",6445481,110879,"Bulgarian lev","🇧🇬","BG","Eastern Europe","Bulgarian"],
+["Cambodia","Phnom Penh","Asia",16944826,181035,"Cambodian riel","🇰🇭","KH","Southeast Asia","Khmer"],
+["Cameroon","Yaoundé","Africa",28647293,475442,"Central African CFA franc","🇨🇲","CM","Middle Africa","French, English"],
+["Colombia","Bogotá","Americas",52321152,1141748,"Colombian peso","🇨🇴","CO","South America","Spanish"],
+["Costa Rica","San José","Americas",5212173,51100,"Costa Rican colón","🇨🇷","CR","Central America","Spanish"],
+["Croatia","Zagreb","Europe",3855641,56594,"Euro","🇭🇷","HR","Southern Europe","Croatian"],
+["Cuba","Havana","Americas",11194449,109884,"Cuban peso","🇨🇺","CU","Caribbean","Spanish"],
+["Czechia","Prague","Europe",10900555,78865,"Czech koruna","🇨🇿","CZ","Central Europe","Czech"],
+["Denmark","Copenhagen","Europe",5946952,43094,"Danish krone","🇩🇰","DK","Northern Europe","Danish"],
+["Ecuador","Quito","Americas",18001000,283561,"United States dollar","🇪🇨","EC","South America","Spanish"],
+["Ethiopia","Addis Ababa","Africa",126527060,1104300,"Ethiopian birr","🇪🇹","ET","Eastern Africa","Amharic"],
+["Finland","Helsinki","Europe",5600000,338455,"Euro","🇫🇮","FI","Northern Europe","Finnish, Swedish"],
+["Ghana","Accra","Africa",34121985,238533,"Ghanaian cedi","🇬🇭","GH","Western Africa","English"],
+["Greece","Athens","Europe",10400000,131957,"Euro","🇬🇷","GR","Southern Europe","Greek"],
+["Hungary","Budapest","Europe",9580000,93028,"Hungarian forint","🇭🇺","HU","Central Europe","Hungarian"],
+["Iran","Tehran","Asia",89172767,1648195,"Iranian rial","🇮🇷","IR","Southern Asia","Persian"],
+["Iraq","Baghdad","Asia",45504560,438317,"Iraqi dinar","🇮🇶","IQ","Western Asia","Arabic, Kurdish"],
+["Ireland","Dublin","Europe",5300000,70273,"Euro","🇮🇪","IE","Northern Europe","Irish, English"],
+["Jamaica","Kingston","Americas",2825544,10991,"Jamaican dollar","🇯🇲","JM","Caribbean","English"],
+["Jordan","Amman","Asia",11337052,89342,"Jordanian dinar","🇯🇴","JO","Western Asia","Arabic"],
+["Kazakhstan","Astana","Asia",19606633,2724900,"Kazakhstani tenge","🇰🇿","KZ","Central Asia","Kazakh, Russian"],
+["Latvia","Riga","Europe",1883000,64559,"Euro","🇱🇻","LV","Northern Europe","Latvian"],
+["Lebanon","Beirut","Asia",5353930,10452,"Lebanese pound","🇱🇧","LB","Western Asia","Arabic"],
+["Lithuania","Vilnius","Europe",2871897,65300,"Euro","🇱🇹","LT","Northern Europe","Lithuanian"],
+["Malaysia","Kuala Lumpur","Asia",34308525,330803,"Malaysian ringgit","🇲🇾","MY","Southeast Asia","Malay"],
+["Maldives","Malé","Asia",521021,300,"Maldivian rufiyaa","🇲🇻","MV","Southern Asia","Dhivehi"],
+["Nepal","Kathmandu","Asia",29694614,147181,"Nepalese rupee","🇳🇵","NP","Southern Asia","Nepali"],
+["Netherlands","Amsterdam","Europe",17977000,41850,"Euro","🇳🇱","NL","Western Europe","Dutch"],
+["Pakistan","Islamabad","Asia",240485658,881912,"Pakistani rupee","🇵🇰","PK","Southern Asia","Urdu, English"],
+["Peru","Lima","Americas",34352719,1285216,"Peruvian sol","🇵🇪","PE","South America","Spanish, Quechua"],
+["Philippines","Manila","Asia",117337368,300000,"Philippine peso","🇵🇭","PH","Southeast Asia","Filipino, English"],
+["Poland","Warsaw","Europe",37636000,312696,"Polish złoty","🇵🇱","PL","Central Europe","Polish"],
+["Portugal","Lisbon","Europe",10400000,92090,"Euro","🇵🇹","PT","Southern Europe","Portuguese"],
+["Qatar","Doha","Asia",2716391,11586,"Qatari riyal","🇶🇦","QA","Western Asia","Arabic"],
+["Romania","Bucharest","Europe",19050000,238397,"Romanian leu","🇷🇴","RO","Eastern Europe","Romanian"],
+["Senegal","Dakar","Africa",17763163,196722,"West African CFA franc","🇸🇳","SN","Western Africa","French, Wolof"],
+["Serbia","Belgrade","Europe",6600000,88361,"Serbian dinar","🇷🇸","RS","Southern Europe","Serbian"],
+["Sri Lanka","Sri Jayawardenepura Kotte","Asia",22037000,65610,"Sri Lankan rupee","🇱🇰","LK","Southern Asia","Sinhala, Tamil"],
+["Sweden","Stockholm","Europe",10550000,450295,"Swedish krona","🇸🇪","SE","Northern Europe","Swedish"],
+["Taiwan","Taipei","Asia",23400000,36197,"New Taiwan dollar","🇹🇼","TW","East Asia","Mandarin"],
+["Tanzania","Dodoma","Africa",67438106,947303,"Tanzanian shilling","🇹🇿","TZ","Eastern Africa","Swahili, English"],
+["Tunisia","Tunis","Africa",12458223,163610,"Tunisian dinar","🇹🇳","TN","Northern Africa","Arabic"],
+["Ukraine","Kyiv","Europe",36700000,603500,"Ukrainian hryvnia","🇺🇦","UA","Eastern Europe","Ukrainian"],
+["United Arab Emirates","Abu Dhabi","Asia",9516871,83600,"UAE dirham","🇦🇪","AE","Western Asia","Arabic"],
+["Uruguay","Montevideo","Americas",3423108,176215,"Uruguayan peso","🇺🇾","UY","South America","Spanish"],
+["Venezuela","Caracas","Americas",28838499,916445,"Venezuelan bolívar","🇻🇪","VE","South America","Spanish"],
+["Vietnam","Hanoi","Asia",98858950,331212,"Vietnamese đồng","🇻🇳","VN","Southeast Asia","Vietnamese"],
+["Zambia","Lusaka","Africa",20569737,752612,"Zambian kwacha","🇿🇲","ZM","Eastern Africa","English"],
+["Zimbabwe","Harare","Africa",16665409,390757,"Zimbabwe Gold","🇿🇼","ZW","Eastern Africa","English, Shona, Ndebele"]
+].map(a=>({name:a[0],capital:a[1],region:a[2],population:a[3],area:a[4],currency:a[5],flag:a[6],code:a[7],subregion:a[8],languages:a[9],fallback:true}));
+
+let countries=[],page=0,pageSize=12;
+function renderCountries(){
+  const q=$("countrySearch").value.trim().toLowerCase(),reg=$("region").value,sort=$("sort").value;
+  let list=countries.filter(c=>(reg==="all"||c.region===reg)&&[c.name,c.capital,c.currency,c.region,c.subregion,c.languages].join(" ").toLowerCase().includes(q));
+  list.sort((a,b)=>sort==="population"?(b.population||0)-(a.population||0):sort==="area"?(b.area||0)-(a.area||0):a.name.localeCompare(b.name));
+  const pages=Math.max(1,Math.ceil(list.length/pageSize));page=Math.min(page,pages-1);const shown=list.slice(page*pageSize,(page+1)*pageSize);
+  $("countryRows").innerHTML=shown.length?shown.map(c=>`<tr><td><button class="country" data-code="${esc(c.code)}"><span class="flag">${esc(c.flag)}</span>${esc(c.name)}</button></td><td>${esc(c.capital)}</td><td>${esc(c.region)}</td><td>${fmt(c.population)}</td><td>${fmt(c.area)}</td><td>${esc(c.currency)}</td></tr>`).join(""):'<tr><td colspan="6">No country matches your search. Try a shorter name.</td></tr>';
+  $("pageInfo").textContent=`Showing ${list.length?page*pageSize+1:0}–${Math.min((page+1)*pageSize,list.length)} of ${list.length} countries`;
+  $("prev").disabled=page===0;$("next").disabled=page>=pages-1;
+  $("countryTotal").textContent=countries.some(c=>!c.fallback)?countries.length:"195+";
+  $("countryStatus").textContent=`${countries.length} profiles loaded · ${countries.some(c=>!c.fallback)?"Live REST Countries directory connected":"Built-in sample directory active; live service could not be reached"}`;
+}
+async function initCountries(){
+  countries=fallback;renderCountries();
+  try{
+    const d=await json("https://restcountries.com/v3.1/all?fields=name,capital,region,subregion,population,currencies,flags,cca3,area,languages");
+    if(!Array.isArray(d)||!d.length)throw Error("Empty response");
+    countries=d.map(c=>({name:c.name?.common||"Unknown",official:c.name?.official||"",capital:c.capital?.[0]||"—",region:c.region||"Other",subregion:c.subregion||"",population:c.population||0,area:c.area||0,currency:Object.values(c.currencies||{}).map(x=>x.name).join(", ")||"—",flag:c.flags?.emoji||"🌐",code:c.cca3||c.name?.common||"",languages:Object.values(c.languages||{}).join(", ")||"—",fallback:false})).sort((a,b)=>a.name.localeCompare(b.name));
+    page=0;renderCountries();markFeed("countries",true);
+  }catch(e){$("countryStatus").textContent="Live country service unavailable — showing built-in country directory so World Explorer still works.";markFeed("countries",false);}
+}
+function openCountry(c){
+  const content=`<h2 style="margin:12px 0 2px">${esc(c.flag)} ${esc(c.name)}</h2><p class="detail">${esc(c.official||c.name)} · ${esc(c.subregion||c.region)}</p><div class="grid" style="grid-template-columns:repeat(2,1fr);margin:14px 0"><div class="stat"><b>${fmt(c.population)}</b><span>POPULATION · LATEST AVAILABLE DATA</span></div><div class="stat"><b>${fmt(c.area)} km²</b><span>LAND AREA (APPROX.)</span></div><div class="stat"><b>${esc(c.capital)}</b><span>CAPITAL CITY</span></div><div class="stat"><b>${esc(c.currency)}</b><span>CURRENCY</span></div></div><p class="detail"><strong>Region:</strong> ${esc(c.region)}<br><strong>Subregion:</strong> ${esc(c.subregion)}<br><strong>Languages:</strong> ${esc(c.languages)}<br><strong>Country code:</strong> ${esc(c.code)}</p><p class="source">${c.fallback?"Built-in reference profile. Values may be approximate and are not live population counts.":"Retrieved from REST Countries. Population and area are reference data, not live measurements."}</p><p><a href="https://data.worldbank.org/country/${esc(c.code.toLowerCase())}" target="_blank" rel="noopener noreferrer">Check World Bank data ↗</a> · <a href="https://www.un.org/geospatial/" target="_blank" rel="noopener noreferrer">UN geospatial ↗</a></p>`;
+  $("modalContent").innerHTML=content;$("modal").classList.add("show");
+}
+$("countryRows").addEventListener("click",e=>{const b=e.target.closest("[data-code]");if(!b)return;const c=countries.find(x=>x.code===b.dataset.code);if(c)openCountry(c)});
+["countrySearch","region","sort"].forEach(id=>$(id).addEventListener(id==="countrySearch"?"input":"change",()=>{page=0;renderCountries()}));
+$("prev").onclick=()=>{page=Math.max(0,page-1);renderCountries()};$("next").onclick=()=>{page++;renderCountries()};
+$("close").onclick=()=>$("modal").classList.remove("show");$("modal").onclick=e=>{if(e.target===$("modal"))$("modal").classList.remove("show")};
+
+/* Explainers & Archive */
+const space=[
+["🪐","The Solar System","The Solar System formed about 4.6 billion years ago from a cloud of gas and dust. The Sun contains most of its mass. Eight planets orbit the Sun, along with dwarf planets, moons, asteroids and comets.","The four inner planets — Mercury, Venus, Earth and Mars — are rocky. Jupiter and Saturn are gas giants; Uranus and Neptune are ice giants.","https://science.nasa.gov/solar-system/"],
+["🌟","How stars are born","Stars form inside cold, dense clouds of gas and dust called nebulae. Gravity pulls material together; as the centre becomes hotter and denser, nuclear fusion can begin.","During most of a star's life, hydrogen nuclei fuse into helium in its core. The energy produced helps balance gravity and makes the star shine.","https://science.nasa.gov/universe/stars/"],
+["🌌","Galaxies","A galaxy is a huge system of stars, gas, dust and dark matter held together by gravity. The Milky Way is a barred spiral galaxy.","Our Solar System lies in the Milky Way's disk, in a region called the Orion Spur. Galaxies can be spiral, elliptical or irregular.","https://science.nasa.gov/universe/galaxies/"],
+["🛰️","Satellites and orbits","Artificial satellites are machines placed in orbit around Earth or another body. They support communication, navigation, weather forecasting and scientific observation.","Low Earth orbit is relatively close to Earth. Geostationary satellites orbit at a special altitude and match Earth's rotation, appearing above roughly the same longitude.","https://www.nasa.gov/learning-resources/"],
+["🌑","Eclipses","A solar eclipse occurs when the Moon passes between Earth and the Sun. A lunar eclipse occurs when Earth moves between the Sun and Moon.","Eclipses do not happen every month because the Moon's orbital plane is tilted relative to Earth's orbit around the Sun.","https://science.nasa.gov/eclipses/"],
+["🔭","How telescopes work","Telescopes collect electromagnetic radiation such as visible light, infrared or radio waves. Larger collecting areas can reveal fainter objects.","Space telescopes can observe wavelengths that Earth's atmosphere absorbs or distorts. Different telescopes reveal different parts of the universe.","https://science.nasa.gov/mission/webb/"]
+];
+const tech=[
+["🧠","Artificial intelligence","Artificial intelligence is a broad field of computing focused on systems that perform tasks often associated with human intelligence, such as recognising patterns or understanding language.","AI systems learn patterns from data or follow programmed rules. Their output can be incorrect or biased, so people should verify important results.","https://www.nist.gov/artificial-intelligence"],
+["🤖","Robotics","A robot combines a physical structure with sensors, a controller and actuators. Sensors collect information; a controller processes it; actuators create movement.","Robots are used in factories, hospitals, agriculture, disaster research and space exploration. Not every robot looks human.","https://www.nasa.gov/robotics/"],
+["🔐","Cybersecurity","Cybersecurity protects computers, networks and information from unauthorised access, disruption or damage.","Core ideas include confidentiality, integrity and availability. Software updates, unique passwords and careful link-checking are useful protective habits.","https://www.cisa.gov/secure-our-world"],
+["🌐","How the internet works","The internet is a global network of networks. Devices exchange data using protocols — shared rules for addressing, routing and communication.","IP addresses identify network interfaces. DNS helps translate human-readable domain names into IP addresses. Routers forward packets toward their destinations.","https://www.cloudflare.com/learning/network-layer/what-is-a-computer-network/"],
+["💾","Inside a computer","The CPU executes instructions. RAM stores data being used right now. Storage keeps files when power is off. Input and output devices connect people and machines.","The CPU fetches, decodes and executes instructions. Modern processors contain multiple cores that can work on tasks concurrently.","https://www.computerhistory.org/"],
+["🧩","Algorithms and data","An algorithm is a finite sequence of steps for solving a problem. Data structures organise information so a program can access and change it efficiently.","Search engines, navigation apps and online shops rely on algorithms and data structures to organise large amounts of information.","https://www.khanacademy.org/computing/computer-science/algorithms"]
+];
+const science=[
+["💧","The water cycle","Water moves through evaporation, transpiration, condensation, precipitation and collection. Sunlight supplies energy for much of the cycle.","Water can change state between liquid, vapour and ice. The cycle connects oceans, atmosphere, rivers, soil, groundwater and living things.","https://www.usgs.gov/special-topics/water-science-school/science/water-cycle"],
+["🧬","DNA: the instruction molecule","DNA stores hereditary information in the order of its chemical bases: adenine, thymine, cytosine and guanine.","In the familiar double-helix structure, A pairs with T and C pairs with G. Sections of DNA called genes contribute to making functional RNA and proteins.","https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet"],
+["🌋","Earthquakes and seismic waves","Earth's outer shell is divided into moving tectonic plates. Stress can build along faults and be released suddenly, producing seismic waves.","Seismometers record ground motion. Scientists use arrival times and wave patterns to estimate an earthquake's location, depth and magnitude.","https://earthquake.usgs.gov/"],
+["☀️","Renewable energy","Renewable energy comes from sources replenished naturally, such as sunlight, wind, flowing water and geothermal heat.","Solar panels convert light into electricity. Wind turbines convert moving air into rotational energy and then electricity. Each technology has environmental and land-use considerations.","https://www.iea.org/"],
+["🧲","Magnetism","Magnetism is associated with moving electric charges and intrinsic magnetic properties of particles. Magnetic fields exert forces on magnets and moving charges.","Earth has a magnetic field that helps guide compasses. The field is generated mainly by motion in the liquid outer core.","https://www.nationalgeographic.org/encyclopedia/magnetism/"],
+["🦠","Microorganisms","Microorganisms include bacteria, archaea, many fungi, microscopic algae and protozoa. Some cause disease, while many are essential to ecosystems and food production.","Microbes help decompose organic matter, recycle nutrients and support digestion. Fermentation uses microorganisms to make foods such as yoghurt and bread.","https://www.cdc.gov/microbes/"]
+];
+function makeCards(arr,id){$(id).innerHTML=arr.map((x,i)=>`<article class="tile"><div class="tiletop"><div class="emoji">${x[0]}</div><span class="pill">EXPLAINER</span></div><h3>${x[1]}</h3><p>${x[2].slice(0,135)}…</p><button data-card="${id}-${i}">Read detailed facts ↗</button></article>`).join("");$(id).addEventListener("click",e=>{const b=e.target.closest("[data-card]");if(!b)return;const i=Number(b.dataset.card.split("-").pop()),x=arr[i];$("modalContent").innerHTML=`<h2 style="margin:12px 0">${x[0]} ${esc(x[1])}</h2><p class="detail">${esc(x[2])}</p><p class="detail">${esc(x[3])}</p><p class="source">Trusted reference: <a href="${esc(safeUrl(x[4]))}" target="_blank" rel="noopener noreferrer">Open original source ↗</a></p>`;$("modal").classList.add("show")})}
+makeCards(space,"spaceCards");makeCards(tech,"techCards");makeCards(science,"scienceCards");
+
+const archive=[
+["🌍","Why Earth looks blue","Earth looks blue in many space photographs largely because oceans cover about 71% of its surface. The atmosphere also scatters blue wavelengths, creating a blue rim; the ocean itself absorbs red light more strongly than blue.","NASA Earth Observatory","https://science.nasa.gov/earth/earth-observatory/the-top-of-the-atmosphere-7373/"],
+["🌊","Why the ocean looks blue","Water absorbs red wavelengths more strongly than blue, so blue light is more likely to be scattered back toward our eyes. Particles and organisms can change the ocean’s colour too.","NOAA Ocean Service","https://oceanservice.noaa.gov/facts/oceanblue.html"],
+["📡","How GPS finds your location","GPS receivers compare the arrival times of signals from multiple satellites. Accurate timing lets a receiver calculate its position; buildings and terrain can reduce accuracy.","GPS.gov","https://www.gps.gov/"],
+["🌱","What biodiversity means","Biodiversity is the variety of life at genetic, species and ecosystem levels. It supports food webs, pollination, soil health and ecosystem resilience.","Convention on Biological Diversity","https://www.cbd.int/"],
+["⚡","How electricity reaches homes","Power stations generate electricity. Transformers change voltage for efficient transmission; local distribution networks then deliver electricity to buildings.","U.S. Energy Information Administration","https://www.eia.gov/energyexplained/electricity/"],
+["🧪","The scientific method","Scientists ask questions, develop testable explanations, collect evidence and share results. Scientific explanations can be revised when new evidence appears.","NASA Science","https://science.nasa.gov/"],
+["🧊","Why glaciers matter","Glaciers store freshwater and shape landscapes. Changes in glacier mass contribute to sea-level rise and can affect water supplies downstream.","NASA Earth Science","https://science.nasa.gov/earth/"],
+["🌊","How ocean currents move heat","Ocean currents transport heat, nutrients and organisms. Winds, differences in water density, tides and Earth's rotation all influence circulation.","NOAA Ocean Service","https://oceanservice.noaa.gov/education/tutorial_currents/"],
+["🌋","How volcanoes form","Volcanoes commonly form where tectonic plates separate, collide or where hot material rises through the mantle. Eruptions vary widely in style and hazard.","USGS Volcano Hazards Program","https://www.usgs.gov/programs/VHP"],
+["🌧️","How the water cycle works","Water evaporates, condenses into clouds, falls as precipitation and returns through rivers, groundwater and ice. Energy from the Sun drives much of this cycle.","USGS Water Science School","https://www.usgs.gov/special-topics/water-science-school/science/water-cycle"],
+["🧬","What DNA does","DNA stores hereditary instructions in sequences of chemical bases. Cells use genetic information to make RNA and proteins that help build and operate living organisms.","National Human Genome Research Institute","https://www.genome.gov/about-genomics/fact-sheets/Deoxyribonucleic-Acid-Fact-Sheet"],
+["🦠","Why microbes matter","Microorganisms include bacteria, archaea, fungi and microscopic organisms. Many decompose material, recycle nutrients and support human and ecosystem health.","U.S. Centers for Disease Control and Prevention","https://www.cdc.gov/"],
+["🔐","Three pillars of cybersecurity","Confidentiality, integrity and availability are core security goals. Strong authentication, software updates and careful link checking help reduce common risks.","NIST Cybersecurity Framework","https://www.nist.gov/cyberframework"],
+["🤖","How robots sense the world","Robots combine sensors, software and actuators. Sensors measure surroundings; control systems interpret signals and decide how motors or other mechanisms should respond.","NASA Robotics","https://www.nasa.gov/robotics/"],
+["🧠","How artificial intelligence is evaluated","AI systems can be useful but may produce errors or biased results. Evaluation considers accuracy, reliability, safety, privacy and the context of use.","NIST AI Risk Management Framework","https://www.nist.gov/itl/ai-risk-management-framework"],
+["🌳","Why forests matter","Forests store carbon, support biodiversity, protect soil and influence water cycles. Sustainable management helps maintain these benefits over time.","Food and Agriculture Organization","https://www.fao.org/forestry/"],
+["☀️","How solar panels make electricity","Photovoltaic cells convert light into electrical energy. Their output depends on sunlight, temperature, panel orientation, shading and system design.","U.S. Department of Energy","https://www.energy.gov/eere/solar/how-does-solar-work"],
+["🌬️","How wind turbines generate power","Wind turns turbine blades, driving a generator that converts mechanical energy into electricity. Output varies with wind speed and turbine design.","U.S. Department of Energy","https://www.energy.gov/eere/wind/how-do-wind-turbines-work"],
+["🛰️","How satellites monitor Earth","Earth-observing satellites measure clouds, land cover, ocean conditions, ice and atmospheric properties. Repeated observations help scientists track change over time.","NASA Earth Observatory","https://earthobservatory.nasa.gov/"],
+["🌡️","What the greenhouse effect is","Certain atmospheric gases absorb and re-emit infrared radiation, warming Earth's surface and lower atmosphere. Human activities have increased concentrations of several greenhouse gases.","NASA Climate Change","https://science.nasa.gov/climate-change/"],
+["🧲","Earth's magnetic field","Earth's magnetic field is generated mainly by the movement of electrically conducting liquid iron in the outer core. It helps shield the planet from some charged particles.","NOAA National Centers for Environmental Information","https://www.ncei.noaa.gov/products/geomagnetism"],
+["🌙","Why the Moon has phases","The Moon's phases arise as we see changing portions of its sunlit half while it orbits Earth. The Moon does not make its own visible light.","NASA Moon","https://science.nasa.gov/moon/"],
+["🪐","Why planets stay in orbit","A planet's forward motion and the Sun's gravitational pull combine to create an orbit. Planetary paths are ellipses, though many are close to circular.","NASA Solar System","https://science.nasa.gov/solar-system/"],
+["🌐","How the internet sends information","The internet moves data in packets across interconnected networks. Protocols and routers help packets travel between devices and services.","Cloudflare Learning Center","https://www.cloudflare.com/learning/network-layer/what-is-a-computer-network/"],
+["💾","RAM and storage are different","RAM temporarily holds data a device is actively using. Storage keeps files and applications when the device is powered off.","Computer History Museum","https://www.computerhistory.org/"],
+["🌾","Why soil is a living system","Soil contains minerals, organic matter, water, air and organisms. Healthy soils support plant growth, store carbon and help filter water.","FAO Soils Portal","https://www.fao.org/soils-portal/"],
+["🐝","Why pollinators are important","Bees, butterflies, birds, bats and other animals transfer pollen between flowers. Pollination supports reproduction in many wild plants and crops.","FAO Pollination","https://www.fao.org/pollination/en/"],
+["🧊","What causes sea-level rise","Global mean sea level rises mainly because ocean water expands as it warms and land ice melts. Local sea-level change also depends on land movement and ocean circulation.","NASA Sea Level Change","https://sealevel.nasa.gov/"],
+["🧫","How vaccines train the immune system","Vaccines expose the immune system to a harmless form or component of a pathogen, helping the body prepare a response without having to experience the disease itself.","World Health Organization","https://www.who.int/health-topics/vaccines-and-immunization"],
+["🧭","How maps use coordinates","Latitude and longitude describe positions on Earth's surface. Map projections transform the curved Earth onto a flat map, which always introduces some distortion.","USGS Map Projections","https://www.usgs.gov/programs/national-geospatial-program/map-projections"],
+["🌌","What a galaxy contains","A galaxy is a gravitationally bound system of stars, gas, dust and dark matter. Galaxies occur in many shapes and sizes.","NASA Galaxies","https://science.nasa.gov/universe/galaxies/"]
+];
+let dailyArchiveItems=[];
+function archiveCategory(x){
+ const t=(x.title+" "+x.desc).toLowerCase();
+ if(/gps|robot|artificial intelligence|internet|ram|storage|cybersecurity|electricity|solar panel|wind turbine/.test(t))return "Technology & engineering";
+ if(/galaxy|moon|planet|satellite|sun|space/.test(t))return "Space & astronomy";
+ if(/forest|biodiversity|glacier|ocean|water|volcano|earthquake|climate|greenhouse|magnetic|soil|pollinat|sea-level|carbon|earth looks blue/.test(t))return "Earth & environment";
+ return "Science & life";
+}
+let selectedArchiveCategory="";
+function renderArchive(){
+ const category=selectedArchiveCategory;
+ const results=$("archiveResults");
+ if(!category){
+  results.hidden=true;
+  $("archiveGroups").innerHTML="";
+  $("archiveSearchStatus").textContent="";
+  return;
+ }
+ const saved=archive.map(x=>({icon:x[0],title:x[1],desc:x[2],source:x[3],url:x[4],kind:"REFERENCE"}));
+ const filtered=saved.filter(x=>category==="all"||archiveCategory(x)===category);
+ const label=category==="all"?"All topics":category;
+ $("archiveResultsEyebrow").textContent=label+" · curated explainers";
+ $("archiveSearchStatus").textContent=`${filtered.length} explainers · ${label}. All matching information is shown together below.`;
+ $("archiveGroups").innerHTML=filtered.map(x=>`<article class="tile"><div class="tiletop"><div class="emoji">${esc(x.icon)}</div><span class="pill">REFERENCE</span></div><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p><a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">Reference: ${esc(x.source)} ↗</a></article>`).join("")||'<div class="empty">No entries are available in this category yet.</div>';
+ results.hidden=false;
+}
+const archiveTrigger=$("archiveCategoryPick"),archivePage=$("archiveCategoryPage");
+function openArchiveCategoryPage(){archivePage.classList.add("show");document.body.style.overflow="hidden";}
+function closeArchiveCategoryPage(){archivePage.classList.remove("show");document.body.style.overflow="";}
+archiveTrigger.addEventListener("click",openArchiveCategoryPage);
+$("closeArchiveCategoryPage").addEventListener("click",closeArchiveCategoryPage);
+$("archiveCategoryGrid").querySelectorAll("[data-category]").forEach(option=>option.addEventListener("click",()=>{
+ selectedArchiveCategory=option.dataset.category;
+ $("archiveCategoryLabel").textContent=option.querySelector("h4").textContent;
+ closeArchiveCategoryPage();renderArchive();
+}));
+document.addEventListener("keydown",event=>{if(event.key==="Escape"&&archivePage.classList.contains("show"))closeArchiveCategoryPage();});
+renderArchive();
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));
+  document.querySelectorAll(".tabpanel").forEach(x=>x.hidden=true);
+  const p=$("panel-"+b.dataset.tab);p.hidden=false;
+  p.style.animation="none";void p.offsetWidth;p.style.animation="";
+});
+
+async function loadRepos(){
+  const q=$("repoSearch").value.trim();
+  const since=new Date(Date.now()-30*24*60*60*1000).toISOString().slice(0,10);
+  const query=(q?`${q} `:"")+`created:>=${since}`;
+  $("repoStatus").textContent="Checking GitHub for recently created public projects…";
+  try{
+    const d=await json("https://api.github.com/search/repositories?q="+encodeURIComponent(query)+"&sort=updated&order=desc&per_page=12");
+    const items=d.items||[];
+    $("repoStatus").textContent=`${d.total_count.toLocaleString()} public projects created since ${since} matched${items.length?`; showing ${items.length} results`:"; no recent matches found"}. Checked ${new Date().toLocaleString()}.`;
+    $("repoCards").innerHTML=items.map(r=>`<article class="tile"><div class="tiletop"><div class="emoji">⌘</div><span class="pill">${esc(r.language||"Open source")}</span></div><h3>${esc(r.full_name)}</h3><p>${esc(r.description||"No description supplied.")}</p><p class="detail">★ ${fmt(r.stargazers_count)} · Created ${new Date(r.created_at).toLocaleDateString()} · Updated ${new Date(r.updated_at).toLocaleDateString()}</p><a href="${esc(safeUrl(r.html_url))}" target="_blank" rel="noopener noreferrer">Open repository ↗</a></article>`).join("")||'<div class="empty">No matching projects were created in the last 30 days. Try a broader search or check again later.</div>';
+    markFeed("github",true);
+  }catch(e){
+    $("repoStatus").textContent="GitHub is temporarily unavailable or rate-limited. Try again later; technology explainers remain available.";
+    $("repoCards").innerHTML='<div class="empty">Live project search unavailable. Try again later.</div>';
+    markFeed("github",false);
+  }
+}
+$("repoButton").onclick=loadRepos;$("repoSearch").addEventListener("keydown",e=>{if(e.key==="Enter")loadRepos()});
+
+// Daily technology and archive feeds. These refresh on UTC day changes and when the page is reopened.
+async function loadDailyProjects(){
+  const since=new Date(Date.now()-7*24*60*60*1000).toISOString().slice(0,10);
+  const q=`created:>=${since}`;
+  try{
+    const d=await json("https://api.github.com/search/repositories?q="+encodeURIComponent(q)+"&sort=updated&order=desc&per_page=12");
+    const items=d.items||[];
+    const checked=new Date().toLocaleString();
+    $("repoStatus").textContent=`GitHub public projects created since ${since} · ${d.total_count.toLocaleString()} matches · checked ${checked}. This is a rolling discovery feed; a new project is not guaranteed every day.`;
+    $("dailyProjectsStatus").textContent=`Latest project search · ${items.length} results shown · created within the last 7 days · checked ${checked}.`;
+    $("dailyProjectsHeadline").textContent=items.length?`Latest result: ${items[0].full_name} · ${items[0].language||"Open source"} · created ${new Date(items[0].created_at).toLocaleDateString()}.`:"No new public projects matched the last seven days; the feed will check again.";
+    $("dailyProjectCards").innerHTML=items.slice(0,8).map(r=>`<article class="tile"><div class="tiletop"><div class="emoji">⌘</div><span class="pill">${esc(r.language||"Open source")}</span></div><h3>${esc(r.full_name)}</h3><p>${esc(r.description||"No description supplied.")}</p><p class="detail">★ ${fmt(r.stargazers_count)} · Created ${new Date(r.created_at).toLocaleDateString()} · Updated ${new Date(r.updated_at).toLocaleDateString()}</p><a href="${esc(safeUrl(r.html_url))}" target="_blank" rel="noopener noreferrer">Open original repository ↗</a></article>`).join("")||'<div class="empty">No recent public projects were found. Search a topic or check again later.</div>';
+    markFeed("github",true);
+  }catch(e){$("repoStatus").textContent="GitHub daily project feed unavailable. Try again later.";$("dailyProjectsStatus").textContent="The live project feed could not be reached.";$("dailyProjectsHeadline").textContent="No live results are shown until GitHub responds.";$("dailyProjectCards").innerHTML='<div class="empty">Could not load the daily project feed. Existing technology explainers remain available.</div>';markFeed("github",false);}
+}
+async function loadDailyArchive(){
+  const now=new Date(),mm=String(now.getUTCMonth()+1).padStart(2,"0"),dd=String(now.getUTCDate()).padStart(2,"0");
+  try{
+    let d;try{d=await json(`https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/events/${mm}/${dd}`);}catch(primaryError){d=await json(`https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/${mm}/${dd}`);}
+    const events=(d.events||[]).slice(0,12),checked=new Date().toLocaleString();
+    dailyArchiveItems=events.map(ev=>{
+      const page=ev.pages?.[0],url=page?.content_urls?.desktop?.page|| (page?.title?`https://en.wikipedia.org/wiki/${encodeURIComponent(page.title.replace(/ /g,"_"))}`:"https://en.wikipedia.org/wiki/Portal:History");
+      return {icon:"📜",title:`${ev.year?ev.year+" · ":""}${ev.text||"Historical event"}`,desc:ev.text||"Historical entry supplied by Wikimedia On This Day.",source:"Wikimedia / Wikipedia",url,kind:"DAILY FACT"};
+    });
+    $("dailyArchiveStatus").textContent=`On this day · ${mm}-${dd} UTC · ${events.length} historical entries · checked ${checked}. Refreshes every 6 hours while this page is open and switches to the new date at UTC midnight. These are dated historical events, not breaking news.`;
+    $("dailyFactHeadline").textContent=events.length?`Daily fact: ${events[0].year?events[0].year+" — ":""}${events[0].text}`:"No daily historical entries were returned for this date.";
+    $("dailyArchiveCards").innerHTML=dailyArchiveItems.map(ev=>`<article class="tile"><div class="tiletop"><div class="emoji">${ev.icon}</div><span class="pill">DAILY FACT · ${esc(String(ev.title.match(/^\d{1,4}/)?.[0]||"TODAY"))}</span></div><h3>${esc(ev.title)}</h3><p>${esc(ev.desc)}</p><a href="${esc(safeUrl(ev.url))}" target="_blank" rel="noopener noreferrer">Explore historical reference ↗</a></article>`).join("")||'<div class="empty">No historical entries were returned for today.</div>';
+    renderArchive();markFeed("archive",true);
+  }catch(e){
+    markFeed("archive",false);
+    $("dailyArchiveStatus").textContent="Daily history feed unavailable. Saved archive explainers remain searchable.";
+    $("dailyFactHeadline").textContent="Daily facts will reappear when Wikimedia responds; no entries are invented.";
+    $("dailyArchiveCards").innerHTML='<div class="empty">Could not load today’s historical entries. Saved archive facts remain below.</div>';
+    renderArchive();
+  }
+}
+
+function refreshAll(){
+  liveWeather();liveAQI();liveISS();liveSpaceWeather();liveQuakes();liveEvents();liveHumanReports();liveCO2();liveFX();liveWiki();loadDailyProjects();loadDailyArchive();initCountries();
+}
+$("refresh").onclick=refreshAll;
+
+updateLocationUI();
+updateClocks();
+markFeed("clock",true);
+refreshAll();
+
+setInterval(updateClocks,1000);
+setInterval(renderFeedStatus,15000);
+setInterval(liveISS,15000);
+setInterval(liveSpaceWeather,60000);
+setInterval(liveQuakes,120000);
+setInterval(liveWeather,300000);
+setInterval(liveAQI,300000);
+setInterval(liveEvents,900000); // Check NASA open natural events every 15 minutes while the page is open.
+setInterval(liveHumanReports,900000); // Refresh geolocated human-activity news coverage every 15 minutes.
+setInterval(loadDailyProjects,6*60*60*1000);
+setInterval(loadDailyArchive,6*60*60*1000);
+setInterval(liveCO2,1800000); // Check live CO₂ sources every 30 minutes; refreshAll() also checks on page load.
+setInterval(liveFX,1800000);
+setInterval(liveWiki,6*60*60*1000);
+let nexoraDailyDate=new Date().toISOString().slice(0,10);
+setInterval(()=>{const today=new Date().toISOString().slice(0,10);if(today!==nexoraDailyDate){nexoraDailyDate=today;liveEvents();liveWiki();loadDailyProjects();loadDailyArchive();}},60000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){liveEvents();liveHumanReports();liveQuakes();liveWiki();loadDailyProjects();loadDailyArchive();}});
+</script><!-- NEXORA performance optimisation: visibility-aware animations, capped animation frame rates, and in-flight request de-duplication. All sections and live-feed schedules are preserved. -->
+</body></html>
